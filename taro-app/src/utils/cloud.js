@@ -46,7 +46,8 @@ async function _do_chat(session, { message, thinker, mode }) {
     }
     result = { replies: res.replies || [], panel: res.panel || [] };
   } else {
-    const reply = await thinker_route(message, thinker, mode, store.recent_history(session));
+    const onToken = typeof data.onToken === 'function' ? data.onToken : null;
+    const reply = await thinker_route(message, thinker, mode, store.recent_history(session), onToken);
     store.add_message(session, 'assistant', reply, thinker);
     result = { reply };
   }

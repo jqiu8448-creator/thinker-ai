@@ -10,6 +10,14 @@
   border-top: 1px solid var(--line);
   z-index: 50;
 }
+.tab-brand {
+  display: none; /* 手机端隐藏，桌面端作为顶部品牌 */
+}
+.tab-items {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
 .tab-item {
   flex: 1;
   display: flex;
@@ -23,4 +31,46 @@
 }
 .tab-item.on .tab-label {
   color: var(--gold);
+}
+
+/* 桌面端：底部 tabBar → 顶部导航栏（fixed 固定在居中列顶端，不受页面 padding 影响） */
+@media (min-width: 768px) {
+  .tabbar {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1000px;
+    bottom: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 88px;
+    padding: 0 32rpx;
+    border-top: none;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .tab-brand {
+    display: flex;
+    align-items: center;
+    font-size: 34rpx;
+    color: var(--gold);
+    letter-spacing: 3rpx;
+  }
+  .tab-items {
+    flex: none;
+    width: auto;
+    display: flex;
+    gap: 12rpx;
+  }
+  .tab-item {
+    flex: none;
+    padding: 0 28rpx;
+    height: 88px;
+  }
+  .tab-label {
+    font-size: 30rpx;
+  }
 }

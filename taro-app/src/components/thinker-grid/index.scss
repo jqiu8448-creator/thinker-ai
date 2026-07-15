@@ -29,6 +29,18 @@
   width: 50%;
   box-sizing: border-box;
 }
+
+/* 桌面端：更宽的列里用 3~4 列网格 */
+@media (min-width: 768px) {
+  .tg-cell {
+    width: 25%;
+  }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tg-cell {
+    width: 33.3333%;
+  }
+}
 .tg-card {
   position: relative;
   margin: 0 7rpx 14rpx;

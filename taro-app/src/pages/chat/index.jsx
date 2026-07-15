@@ -53,6 +53,18 @@ export default function Chat() {
     else addMsg('system', (r && r.error) || '思想家未能作答，请再试一次');
   };
 
+  // 流式增量：把 delta 追加到指定 id 的助手消息上
+  const appendStream = (id, delta) => {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, content: (m.content || '') + delta } : m))
+    );
+  };
+  const finalizeStream = (id, content) => {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, content: content || m.content, streaming: false } : m))
+    );
+  };
+
   // 初次加载：从历史进入 or 从推荐进入
   useEffect(() => {
     const sid = decodeURIComponent(params.sessionId || '');
@@ -103,27 +115,67 @@ export default function Chat() {
   const callChat = (text) => {
     addMsg('user', text);
     setTyping(true);
+
+    // 单人模式（对席/独白）走流式；多人模式（偶得/会饮）整段返回
+    const streamMode = mode !== 'oude' && mode !== 'huiyin';
+    let streamId = null;
+    const onToken = streamMode
+      ? (delta) => {
+          if (streamId != null) appendStream(streamId, delta);
+        }
+      : null;
+
+    if (streamMode) {
+      streamId = seqRef.current++;
+      setMessages((prev) => prev.concat([{ id: streamId, role: 'assistant', content: '', thinker, streaming: true }]));
+      setWelcome(false);
+      setScrollTarget('msg-' + streamId);
+    }
+
     callCloud('chat', {
       message: text,
       thinker,
       mode,
       topic,
       sessionId,
+      onToken,
     }).then((r) => {
       setTyping(false);
       if (!r) return;
       if (!r.ok) {
-        addMsg('system', r.error || '请求失败，请稍后再试');
+        if (streamId != null) {
+          finalizeStream(streamId, r.error || '请求失败，请稍后再试');
+        } else {
+          addMsg('system', r.error || '请求失败，请稍后再试');
+        }
         return;
       }
       setSessionId(r.sessionId);
       getGlobal().lastSessionId = r.sessionId;
-      renderReply(r);
+      if (streamMode) {
+        // 用完整结果收尾（覆盖错误/降级场景），并停止光标
+        finalizeStream(streamId, r.reply);
+      } else {
+        renderReply(r);
+      }
     });
+  };
+
+  const onBack = () => {
+    const pages = Taro.getCurrentPages ? Taro.getCurrentPages() : [];
+    if (pages.length > 1) Taro.navigateBack();
+    else Taro.reLaunch({ url: '/pages/home/index' });
   };
 
   return (
     <View className="container">
+      <View className="chat-top">
+        <View className="ct-back" onClick={onBack}>
+          ‹ 返回
+        </View>
+        <View className="ct-brand kai">思想家 · AI</View>
+        <View className="ct-title kai">{thinker}</View>
+      </View>
       <ScrollView
         className="chat-area"
         scrollY
@@ -155,6 +207,7 @@ export default function Chat() {
                 {item.thinker && <View className="thinker-label kai">{item.thinker}</View>}
                 <Text className="content" userSelect>
                   {item.content}
+                  {item.streaming && <Text className="stream-cursor">▍</Text>}
                 </Text>
               </View>
             );
@@ -186,7 +239,9 @@ export default function Chat() {
           );
         })}
 
-        {typing && <View className="typing kai">思想家正在思考…</View>}
+        {typing && !messages.some((m) => m.streaming && m.content) && (
+          <View className="typing kai">思想家正在思考…</View>
+        )}
       </ScrollView>
 
       <View className="input-area">

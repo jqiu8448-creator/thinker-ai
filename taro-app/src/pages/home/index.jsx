@@ -139,21 +139,23 @@ export default function Home() {
       {step === 'result' && recommends.length > 0 && (
         <View className="rec-head kai">为你寻得三位知己</View>
       )}
-      {recommends.map((item, idx) => (
-        <View
-          key={item.name}
-          className="rec-card"
-          onClick={() => onPick(item)}
-          hoverClass="rec-hover"
-        >
-          <View className="rec-no kai">{idx + 1}</View>
-          <View className="rec-body">
-            <View className="rec-name kai">{item.name}</View>
-            <View className="rec-reason">{item.reason}</View>
+      <View className="rec-list">
+        {recommends.map((item, idx) => (
+          <View
+            key={item.name}
+            className="rec-card"
+            onClick={() => onPick(item)}
+            hoverClass="rec-hover"
+          >
+            <View className="rec-no kai">{idx + 1}</View>
+            <View className="rec-body">
+              <View className="rec-name kai">{item.name}</View>
+              <View className="rec-reason">{item.reason}</View>
+            </View>
+            <View className="rec-go kai">谈 ›</View>
           </View>
-          <View className="rec-go kai">谈 ›</View>
-        </View>
-      ))}
+        ))}
+      </View>
 
       {step === 'result' && recommends.length === 0 && !loading && (
         <View className="empty kai">暂未寻得合适之人，换种说法再试。</View>

@@ -1,7 +1,7 @@
 // 前端对话引擎（移植自 server/lib/thinker.js + router.js 的相关生成逻辑）
 // 纯函数 + llm.generateText，无后端依赖。数据来自打包好的 thinkers.json。
 import thinkersData from '@/data/thinkers.json';
-import { generateText } from './llm';
+import { generateText, generateTextStream } from './llm';
 import { MODES, MODE_PROMPTS, UNIVERSAL_NAMES, AI_MODEL } from './engine-modes';
 
 const ALL_THINKERS = thinkersData.thinkers || [];
@@ -31,7 +31,8 @@ function build_thinker_list_brief() {
 }
 
 // ============ 单人对话 ============
-export async function thinker_route(message, thinker_name, mode, history = []) {
+// onToken：传入时启用流式，逐段回调增量文本；不传则一次性返回完整文本。
+export async function thinker_route(message, thinker_name, mode, history = [], onToken = null) {
   const skill_content = get_thinker_skill(thinker_name);
   if (!skill_content) {
     return `抱歉，暂时找不到「${thinker_name}」的人格档案。请确认该思想家已收录。`;
@@ -77,6 +78,15 @@ ${MODE_PROMPTS[modeKey](thinker_name)}
   messages.push({ role: 'user', content: message });
 
   try {
+    if (onToken) {
+      return await generateTextStream({
+        model: AI_MODEL,
+        messages,
+        temperature: modeInfo.temperature,
+        topP: 0.9,
+        onToken,
+      });
+    }
     return await generateText({
       model: AI_MODEL,
       messages,

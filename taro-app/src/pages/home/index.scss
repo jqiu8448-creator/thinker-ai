@@ -125,6 +125,21 @@
   padding: 24rpx 22rpx;
   margin-bottom: 18rpx;
 }
+.rec-list {
+  display: block;
+}
+/* 桌面端：引荐卡片横向排列 */
+@media (min-width: 768px) {
+  .rec-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18rpx;
+  }
+  .rec-card {
+    flex: 1 1 calc(33.3333% - 18rpx);
+    margin-bottom: 0;
+  }
+}
 .rec-hover {
   border-color: var(--gold);
   background: var(--panel-2);

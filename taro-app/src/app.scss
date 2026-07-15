@@ -8,3 +8,29 @@ body {
   color: var(--cream);
   font-family: -apple-system, 'PingFang SC', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
 }
+
+/* ===== 桌面端适配（网页布局）=====
+   手机端（< 768px）保持整屏铺满、底部 tabBar；电脑端改为居中的「网页内容列」
+   （更宽的 max-width），两侧留出页面底色，并把底部 tabBar 变为顶部导航。
+   根字号在桌面端固定为网页舒适值，由 src/utils/fit-viewport.js 控制。 */
+@media (min-width: 768px) {
+  html,
+  body {
+    background: #0e0c0a; /* 列外底色，与列内 --ink 区分 */
+  }
+  #app {
+    position: relative;
+    max-width: 1000px; /* 网页舒适内容宽度 */
+    margin: 0 auto;
+    min-height: 100vh;
+    height: 100vh;
+    background: var(--ink);
+    box-shadow: 0 0 80rpx rgba(0, 0, 0, 0.5);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  /* 桌面端顶部导航为 fixed，内容需下方留出导航高度 */
+  .page {
+    padding-top: 104rpx !important;
+  }
+}

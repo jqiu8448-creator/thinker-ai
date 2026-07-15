@@ -5,6 +5,11 @@
   background: var(--ink);
 }
 
+/* 桌面端顶部条（手机端隐藏，沿用系统导航） */
+.chat-top {
+  display: none;
+}
+
 .chat-area {
   flex: 1;
   padding: 24rpx;
@@ -47,6 +52,16 @@
   color: var(--gold);
   letter-spacing: 2rpx;
   margin-bottom: 12rpx;
+}
+.stream-cursor {
+  color: var(--gold);
+  font-weight: normal;
+  margin-left: 2rpx;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
 }
 .msg.system {
   align-self: center;
@@ -170,4 +185,36 @@
   padding: 0 28rpx;
   font-size: 28rpx;
   border-radius: 12rpx;
+}
+
+/* 桌面端：对话列居中、限制阅读宽度，并显示顶部条 */
+@media (min-width: 768px) {
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .chat-top {
+    display: flex;
+    align-items: center;
+    height: 88px;
+    padding: 0 32rpx;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .chat-top .ct-brand {
+    font-size: 34rpx;
+    color: var(--gold);
+    letter-spacing: 3rpx;
+  }
+  .chat-top .ct-back {
+    margin-right: 20rpx;
+    font-size: 30rpx;
+    color: var(--muted);
+  }
+  .chat-top .ct-title {
+    flex: 1;
+    font-size: 30rpx;
+    color: var(--cream);
+    letter-spacing: 2rpx;
+  }
 }

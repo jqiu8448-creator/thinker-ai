@@ -18,15 +18,18 @@ export default function Tabbar({ current }) {
 
   return (
     <View className="tabbar">
-      {TABS.map((t) => (
-        <View
-          key={t.key}
-          className={`tab-item ${current === t.key ? 'on' : ''}`}
-          onClick={() => go(t.url)}
-        >
-          <Text className="tab-label">{t.label}</Text>
-        </View>
-      ))}
+      <View className="tab-brand kai">思想家 · AI</View>
+      <View className="tab-items">
+        {TABS.map((t) => (
+          <View
+            key={t.key}
+            className={`tab-item ${current === t.key ? 'on' : ''}`}
+            onClick={() => go(t.url)}
+          >
+            <Text className="tab-label">{t.label}</Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }

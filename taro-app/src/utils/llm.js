@@ -1,6 +1,8 @@
 // 前端 LLM 客户端（OpenAI 兼容）
 // 浏览器内直连用户自有接口，不依赖任何后端。
-// 与 server/lib/llm.js 的 generateViaOpenAI 行为一致（非流式，返回完整文本）。
+// - generateText：非流式，返回完整文本（推荐/多人模式等一次性结果用）。
+// - generateTextStream：流式，边收边回调 onToken(delta)，结束时返回完整文本；
+//   对不支持流式的接口自动降级为非流式（仍会一次性把全文通过 onToken 给出）。
 import { getApiConfig } from './api-config';
 
 /**
@@ -46,6 +48,115 @@ export async function generateText({ model, messages, temperature = 0.7, topP = 
     throw new Error('API 返回格式异常：' + JSON.stringify(json).slice(0, 200));
   }
   return text;
+}
+
+/**
+ * 流式生成（OpenAI 兼容 SSE）。
+ * 每收到一段增量内容就调用 onToken(delta)，结束时返回拼接后的完整文本。
+ * 若接口不支持流式（响应无 body reader 或非 text/event-stream），自动降级为
+ * 非流式调用，并一次性把全文通过 onToken 给出，保证调用方逻辑不变。
+ * @param {object} opts
+ * @param {Array}  opts.messages
+ * @param {string} [opts.model]
+ * @param {number} [opts.temperature]
+ * @param {number} [opts.topP]
+ * @param {(delta:string)=>void} [opts.onToken]
+ * @param {AbortSignal} [opts.signal]
+ */
+export async function generateTextStream({ model, messages, temperature = 0.7, topP = 0.9, onToken, signal }) {
+  const cfg = getApiConfig();
+  if (!cfg || !cfg.baseUrl || !cfg.apiKey) {
+    throw new Error('尚未配置 API（请在设置中填写 Base URL 与 API Key）');
+  }
+  const usedModel = cfg.model || model || 'gpt-3.5-turbo';
+
+  const post = (stream) =>
+    fetch(`${cfg.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${cfg.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: usedModel,
+        messages,
+        temperature,
+        top_p: topP,
+        stream,
+      }),
+      signal,
+    });
+
+  // 非流式兜底（供降级使用）
+  const fallbackNonStream = async () => {
+    const full = await generateText({ model: usedModel, messages, temperature, topP });
+    if (onToken) onToken(full);
+    return full;
+  };
+
+  let resp;
+  try {
+    resp = await post(true);
+  } catch (e) {
+    // 网络层不支持流式（极少数环境），尝试非流式
+    return await fallbackNonStream();
+  }
+
+  if (!resp.ok) {
+    let detail = '';
+    try {
+      detail = (await resp.text()).slice(0, 300);
+    } catch (e) {}
+    // 部分网关拒绝 stream 请求，降级为非流式
+    return await fallbackNonStream().catch(() => {
+      throw new Error(`API HTTP ${resp.status}：${detail}`);
+    });
+  }
+
+  const contentType = resp.headers && resp.headers.get ? resp.headers.get('content-type') || '' : '';
+  if (!resp.body || !resp.body.getReader || (contentType && !/text\/event-stream/.test(contentType))) {
+    // 明确非事件流，降级为非流式
+    return await fallbackNonStream();
+  }
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+  let full = '';
+
+  const consumeLine = (rawLine) => {
+    const line = rawLine.trim();
+    if (!line || !line.startsWith('data:')) return;
+    const payload = line.slice(5).trim();
+    if (payload === '[DONE]') return;
+    let json;
+    try {
+      json = JSON.parse(payload);
+    } catch (e) {
+      return; // 跳过无法解析的片段
+    }
+    const delta = json?.choices?.[0]?.delta?.content;
+    if (delta) {
+      full += delta;
+      if (onToken) onToken(delta);
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let idx;
+    while ((idx = buffer.indexOf('\n')) >= 0) {
+      const line = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 1);
+      consumeLine(line);
+    }
+  }
+  // 收尾：处理最后一行（可能无结尾换行）
+  if (buffer.trim()) consumeLine(buffer);
+
+  return full;
 }
 
 /**
