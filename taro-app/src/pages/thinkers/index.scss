@@ -1,0 +1,265 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--ink);
+  padding: 0;
+}
+.hint {
+  flex: none;
+  font-size: 28rpx;
+  color: var(--muted);
+  text-align: center;
+  padding: 22rpx 0 18rpx;
+  letter-spacing: 2rpx;
+}
+
+/* 卡片区 */
+.cards {
+  flex: 1;
+  height: 100%;
+  padding: 16rpx 8rpx 40rpx;
+}
+
+/* 详情弹窗 */
+.d-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 36rpx;
+  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+}
+.d-bar-title {
+  font-size: 30rpx;
+  color: var(--gold);
+  letter-spacing: 4rpx;
+}
+.d-close {
+  font-size: 40rpx;
+  line-height: 1;
+  color: var(--muted);
+  padding: 8rpx 16rpx;
+}
+.d-close:active {
+  color: var(--cream);
+}
+.d-scroll {
+  flex: 1;
+  min-height: 0;
+}
+.d-head {
+  padding: 28rpx 36rpx 24rpx;
+  border-bottom: 1px solid var(--line);
+}
+.d-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.d-name {
+  font-size: 50rpx;
+  color: var(--gold);
+  letter-spacing: 6rpx;
+  font-weight: 600;
+}
+.d-acts {
+  display: flex;
+  align-items: center;
+}
+.d-talk {
+  font-size: 26rpx;
+  color: var(--ink);
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+  border-radius: 30rpx;
+  padding: 12rpx 28rpx;
+  letter-spacing: 2rpx;
+}
+.d-talk:active {
+  opacity: 0.85;
+}
+.d-share {
+  font-size: 24rpx;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 30rpx;
+  padding: 12rpx 22rpx;
+  margin-left: 16rpx;
+  letter-spacing: 2rpx;
+}
+.d-share:active {
+  background: var(--line-2);
+}
+.d-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+}
+.d-seal {
+  font-size: 24rpx;
+  line-height: 1.15;
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
+  border-radius: 8rpx;
+  padding: 8rpx 10rpx;
+  text-align: center;
+  transform: rotate(-3deg);
+  opacity: 0.9;
+  max-width: 120rpx;
+}
+.share-canvas {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 600px;
+  height: 840px;
+}
+.d-chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 18rpx;
+}
+.d-chip {
+  font-size: 22rpx;
+  color: var(--cream);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8rpx;
+  padding: 6rpx 18rpx;
+  margin: 0 12rpx 12rpx 0;
+}
+
+/* 区块通用 */
+.d-block {
+  padding: 28rpx 36rpx;
+  border-bottom: 1px solid var(--line-2);
+}
+.d-block-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  color: var(--gold);
+  letter-spacing: 4rpx;
+  margin-bottom: 20rpx;
+}
+.d-block-title::before {
+  content: '';
+  width: 26rpx;
+  height: 4rpx;
+  background: var(--gold);
+  display: inline-block;
+  margin-right: 14rpx;
+}
+
+/* 简介：人物小像 */
+.d-tagline {
+  font-size: 32rpx;
+  color: var(--gold-soft);
+  line-height: 1.7;
+  letter-spacing: 1rpx;
+  font-style: italic;
+  margin-bottom: 24rpx;
+}
+.d-facts {
+  display: flex;
+  margin-bottom: 24rpx;
+}
+.d-fact {
+  flex: 1;
+  min-width: 0;
+  background: var(--input-bg);
+  border: 1px solid var(--line-2);
+  border-radius: 16rpx;
+  padding: 18rpx 20rpx;
+  margin-right: 16rpx;
+}
+.d-fact:last-child {
+  margin-right: 0;
+}
+.d-fact-k {
+  font-size: 22rpx;
+  color: var(--muted-2);
+  letter-spacing: 1rpx;
+}
+.d-fact-v {
+  font-size: 27rpx;
+  color: var(--cream);
+  margin-top: 8rpx;
+  line-height: 1.4;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.d-quote {
+  border-left: 4rpx solid var(--gold);
+  padding: 6rpx 0 6rpx 22rpx;
+  color: var(--cream);
+  font-size: 29rpx;
+  line-height: 1.8;
+}
+.d-quote-src {
+  display: block;
+  font-size: 22rpx;
+  color: var(--muted-2);
+  margin-top: 10rpx;
+}
+
+/* 自述：手稿式 drop-cap */
+.d-narrative {
+  background: var(--input-bg);
+  border: 1px solid var(--line-2);
+  border-radius: 20rpx;
+  padding: 28rpx 28rpx 24rpx;
+}
+.d-lead {
+  float: left;
+  font-size: 60rpx;
+  line-height: 1;
+  color: var(--gold);
+  font-weight: 600;
+  margin: 4rpx 16rpx 0 0;
+}
+.d-narrative-body {
+  font-size: 28rpx;
+  color: var(--cream);
+  line-height: 1.9;
+  text-align: justify;
+}
+.d-sign {
+  clear: both;
+  text-align: right;
+  font-size: 24rpx;
+  color: var(--muted-2);
+  margin-top: 18rpx;
+}
+
+/* 著述 */
+.d-works {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.d-work {
+  display: flex;
+  align-items: baseline;
+  font-size: 28rpx;
+  color: var(--cream);
+  line-height: 1.7;
+}
+.d-work-dot {
+  color: var(--gold);
+  font-size: 24rpx;
+  flex: none;
+  margin-right: 14rpx;
+}
+
+.d-loading {
+  text-align: center;
+  color: var(--muted);
+  padding: 60rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

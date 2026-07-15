@@ -1,0 +1,27 @@
+/* 思想家AI 全局主题变量（从原生小程序 app.wxss 搬运） */
+page,
+body {
+  --ink: #1a1714;
+  --panel: #241f18;
+  --panel-2: #2b251c;
+  --gold: #c8a45c;
+  --gold-soft: #d4b06a;
+  --gold-deep: #b88f3e;
+  --gold-bright: #e8c06a;
+  --cream: #e8dcc0;
+  --muted: #a89878;
+  --muted-2: #8a7c5e;
+  --line: #4a3f2e;
+  --cinnabar: #9e4a3c;
+  --teal: #4a7c6f;
+  --line-2: #322b20;
+  --cream-soft: #c8b89a;
+  --cream-bright: #f3e9d2;
+  --input-bg: #211c17;
+}
+
+/* 衬线/楷体标题类（跨端通用） */
+.kai {
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'KaiTi', serif;
+  letter-spacing: 2rpx;
+}

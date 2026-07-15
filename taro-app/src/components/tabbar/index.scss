@@ -1,0 +1,26 @@
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  height: 96px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--ink);
+  border-top: 1px solid var(--line);
+  z-index: 50;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tab-label {
+  font-size: 26px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+.tab-item.on .tab-label {
+  color: var(--gold);
+}

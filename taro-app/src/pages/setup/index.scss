@@ -1,0 +1,91 @@
+.setup {
+  min-height: 100vh;
+  background: #1a1714;
+  padding: 80px 40px 60px;
+  box-sizing: border-box;
+  color: #e8dcc0;
+}
+
+.s-brand {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.s-title {
+  font-size: 56px;
+  color: #c8a45c;
+  letter-spacing: 4px;
+}
+.s-sub {
+  margin-top: 16px;
+  font-size: 26px;
+  color: #8a7c5e;
+}
+
+.s-card {
+  background: #211c17;
+  border: 1px solid #3a3225;
+  border-radius: 20px;
+  padding: 40px 36px;
+}
+.s-card-title {
+  font-size: 34px;
+  color: #c8a45c;
+  margin-bottom: 16px;
+}
+.s-tip {
+  font-size: 24px;
+  line-height: 1.7;
+  color: #a89a7c;
+  margin-bottom: 36px;
+}
+
+.s-label {
+  font-size: 26px;
+  color: #d4b06a;
+  margin: 28px 0 12px;
+}
+.s-input {
+  background: #16130f;
+  border: 1px solid #3a3225;
+  border-radius: 12px;
+  padding: 22px 24px;
+  font-size: 28px;
+  color: #e8dcc0;
+}
+.s-ph {
+  color: #5a5040;
+}
+
+.s-test {
+  margin-top: 32px;
+}
+.s-test-btn {
+  background: transparent;
+  border: 1px solid #c8a45c;
+  color: #c8a45c;
+  border-radius: 12px;
+  font-size: 28px;
+}
+.s-test-result {
+  display: block;
+  margin-top: 18px;
+  font-size: 24px;
+  color: #a89a7c;
+  line-height: 1.6;
+}
+
+.s-save {
+  margin-top: 48px;
+  background: linear-gradient(90deg, #c8a45c, #b8923f);
+  color: #1a1714;
+  border-radius: 14px;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.s-foot {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 22px;
+  color: #5a5040;
+}

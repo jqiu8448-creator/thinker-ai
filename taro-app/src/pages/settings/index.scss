@@ -1,0 +1,407 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--ink);
+  padding: 0;
+}
+.hint {
+  flex: none;
+  font-size: 28rpx;
+  color: var(--muted);
+  text-align: center;
+  padding: 22rpx 0 18rpx;
+  letter-spacing: 2rpx;
+}
+.loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 28rpx;
+}
+.list {
+  flex: 1;
+  height: 100%;
+  padding: 8rpx 24rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.item {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16rpx;
+  padding: 26rpx 28rpx;
+  margin-bottom: 20rpx;
+}
+.row1 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.t-name {
+  font-size: 36rpx;
+  color: var(--gold);
+  letter-spacing: 2rpx;
+}
+.t-mode {
+  font-size: 24rpx;
+  color: var(--teal);
+  border: 1px solid var(--teal);
+  border-radius: 20rpx;
+  padding: 2rpx 16rpx;
+}
+.t-preview {
+  font-size: 26rpx;
+  color: var(--cream);
+  line-height: 1.6;
+  margin-top: 14rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.row2 {
+  display: flex;
+  align-items: center;
+  margin-top: 16rpx;
+}
+.t-topic {
+  font-size: 24rpx;
+  color: var(--muted);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.t-turns {
+  font-size: 22rpx;
+  color: var(--muted);
+  margin-right: 20rpx;
+}
+.t-time {
+  font-size: 22rpx;
+  color: var(--muted);
+}
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 80rpx 0;
+  font-size: 28rpx;
+}
+
+/* 保留数量设置卡 */
+.setting-card {
+  flex: none;
+  margin: 4rpx 24rpx 8rpx;
+  padding: 22rpx 28rpx;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16rpx;
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.setting-label {
+  font-size: 28rpx;
+  color: var(--cream);
+  letter-spacing: 1rpx;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+}
+.step-btn {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 40rpx;
+  color: var(--gold);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10rpx;
+}
+.step-num {
+  min-width: 70rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: var(--gold);
+}
+.setting-tip {
+  font-size: 21rpx;
+  color: var(--muted-2);
+  margin-top: 12rpx;
+  letter-spacing: 1rpx;
+}
+.setting-value {
+  display: flex;
+  align-items: center;
+}
+.sv-text {
+  font-size: 26rpx;
+  color: var(--muted);
+  letter-spacing: 1rpx;
+}
+.sv-arrow {
+  font-size: 36rpx;
+  color: var(--muted-2);
+  margin-left: 12rpx;
+  line-height: 1;
+}
+
+/* 筛选栏 */
+.filter-bar {
+  flex: none;
+  white-space: nowrap;
+  padding: 12rpx 18rpx;
+  border-bottom: 1px solid var(--line-2);
+}
+.filter {
+  display: inline-block;
+  font-size: 24rpx;
+  color: var(--muted);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 24rpx;
+  padding: 8rpx 22rpx;
+  margin: 0 10rpx;
+}
+.filter.on {
+  color: var(--ink);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+/* 列表项内的星标与标签 */
+.t-fav {
+  font-size: 38rpx;
+  color: var(--muted-2);
+  margin-left: 14rpx;
+  padding: 0 8rpx;
+}
+.t-fav.on {
+  color: var(--gold);
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 14rpx;
+}
+.tag {
+  font-size: 21rpx;
+  color: var(--gold-soft);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+  margin: 0 12rpx 12rpx 0;
+}
+
+/* 标签编辑弹窗 */
+.ed-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 36rpx;
+  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+}
+.ed-title {
+  font-size: 30rpx;
+  color: var(--gold);
+  letter-spacing: 3rpx;
+}
+.ed-close {
+  font-size: 40rpx;
+  line-height: 1;
+  color: var(--muted);
+  padding: 8rpx 16rpx;
+}
+.ed-label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--muted-2);
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+.ed-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--cream);
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: 10rpx;
+  padding: 16rpx 18rpx;
+  line-height: 1.4;
+}
+.ed-ph {
+  color: var(--muted-2);
+  font-size: 26rpx;
+}
+.ed-foot {
+  flex: none;
+  background: var(--ink);
+  padding: 16rpx 36rpx 40rpx;
+  border-top: 1px solid var(--line);
+}
+
+/* 常用功能栅格 */
+.func-title {
+  flex: none;
+  font-size: 30rpx;
+  color: var(--gold);
+  letter-spacing: 3rpx;
+  margin: 8rpx 24rpx 16rpx;
+}
+.func-grid {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 16rpx;
+}
+.func {
+  width: 25%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18rpx 8rpx 24rpx;
+}
+.func-ico {
+  width: 84rpx;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: var(--gold);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 22rpx;
+  margin-bottom: 12rpx;
+}
+.func-name {
+  font-size: 26rpx;
+  color: var(--cream);
+  letter-spacing: 1rpx;
+}
+.func-sub {
+  font-size: 20rpx;
+  color: var(--muted-2);
+  margin-top: 4rpx;
+  max-width: 150rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 历史抽屉：展开更多 */
+.expand-more {
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--gold);
+  letter-spacing: 2rpx;
+  padding: 28rpx 0 12rpx;
+}
+
+/* 水印编辑体 */
+.wm-body {
+  padding: 30rpx 36rpx 20rpx;
+}
+.wm-preview {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  color: var(--muted);
+  letter-spacing: 1rpx;
+}
+
+/* 关于 */
+.about-body {
+  padding: 40rpx 44rpx 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.about-logo {
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-size: 46rpx;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 12rpx;
+  text-indent: 12rpx;
+  margin-bottom: 24rpx;
+}
+.about-desc {
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-style: italic;
+  font-size: 27rpx;
+  color: var(--cream-soft);
+  line-height: 2;
+  letter-spacing: 1rpx;
+}
+.about-ver {
+  margin-top: 26rpx;
+  font-size: 22rpx;
+  color: var(--muted-2);
+  letter-spacing: 2rpx;
+}
+
+/* 通用抽屉底部按钮 */
+.d-btn {
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: 12rpx;
+}
+
+/* AI 接口弹窗 */
+.ai-body {
+  padding: 30rpx 36rpx 20rpx;
+}
+.ai-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+.ai-row .ed-label {
+  margin-bottom: 0;
+}
+.ai-tip {
+  font-size: 21rpx;
+  color: var(--muted-2);
+  letter-spacing: 1rpx;
+  margin-top: 18rpx;
+  line-height: 1.6;
+}
+.ai-test {
+  display: flex;
+  align-items: center;
+  padding: 6rpx 36rpx 18rpx;
+}
+.ai-test-btn {
+  flex: none;
+  font-size: 24rpx;
+  background: var(--panel-2);
+  color: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10rpx;
+  padding: 0 24rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+}
+.ai-test-result {
+  flex: 1;
+  font-size: 22rpx;
+  color: var(--gold-soft);
+  letter-spacing: 1rpx;
+  margin-left: 20rpx;
+  word-break: break-all;
+}

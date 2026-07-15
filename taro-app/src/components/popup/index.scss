@@ -1,0 +1,51 @@
+.ui-popup-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+}
+
+.ui-popup-panel {
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 底部弹出 */
+.ui-popup-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 90vh;
+  border-top-left-radius: 24rpx;
+  border-top-right-radius: 24rpx;
+  overflow: hidden;
+  animation: ui-pop-up 0.22s ease;
+}
+
+/* 右侧抽屉 */
+.ui-popup-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 86%;
+  height: 100%;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  animation: ui-pop-right 0.22s ease;
+}
+
+@keyframes ui-pop-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes ui-pop-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}

@@ -1,0 +1,10 @@
+// 全局基础样式：引入主题变量（theme.scss 通过 config.sass.resource 全局注入，
+// 这里再兜底引入一次以保证 H5 入口也能拿到变量）
+@import './styles/theme.scss';
+
+page,
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: -apple-system, 'PingFang SC', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+}

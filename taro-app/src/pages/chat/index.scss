@@ -1,0 +1,173 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--ink);
+}
+
+.chat-area {
+  flex: 1;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.msg {
+  max-width: 84%;
+  min-width: 0;
+  margin-bottom: 24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  line-height: 1.7;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+.msg .content {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+.msg.user {
+  align-self: flex-end;
+  margin-left: auto;
+  background: rgba(158, 74, 60, 0.22);
+  border: 1px solid var(--cinnabar);
+}
+.msg.assistant {
+  align-self: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.msg.assistant .thinker-label {
+  font-size: 26rpx;
+  color: var(--gold);
+  letter-spacing: 2rpx;
+  margin-bottom: 12rpx;
+}
+.msg.system {
+  align-self: center;
+  max-width: 90%;
+  text-align: center;
+  color: var(--muted);
+  font-size: 26rpx;
+  font-style: italic;
+  background: transparent;
+  border: none;
+  padding: 8rpx 0;
+}
+
+/* 多思想家消息 */
+.msg.multi {
+  align-self: flex-start;
+  max-width: 94%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 6rpx solid var(--gold);
+}
+.msg.multi .multi-head {
+  font-size: 26rpx;
+  color: var(--gold);
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+.bubble {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 16rpx;
+}
+.bubble:last-child {
+  margin-bottom: 0;
+}
+.b-name {
+  font-size: 26rpx;
+  color: var(--gold);
+  margin-bottom: 8rpx;
+}
+.round-tag {
+  color: var(--teal);
+  font-size: 22rpx;
+  margin-left: 12rpx;
+  font-family: 'Songti SC', serif;
+}
+.bubble .content {
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: var(--cream);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 欢迎页 */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+.welcome .w-icon {
+  font-size: 96rpx;
+  opacity: 0.7;
+}
+.welcome .w-title {
+  color: var(--gold);
+  font-size: 48rpx;
+  margin: 20rpx 0;
+  letter-spacing: 4rpx;
+}
+.welcome .w-desc {
+  font-size: 28rpx;
+  color: var(--muted);
+  max-width: 560rpx;
+  line-height: 1.8;
+}
+
+.typing {
+  color: var(--muted);
+  font-size: 28rpx;
+  font-style: italic;
+  padding: 12rpx 0;
+}
+
+/* 输入区 */
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+}
+.input-area .input {
+  flex: 1;
+  background: var(--panel-2);
+  color: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 20rpx;
+  padding: 16rpx 24rpx;
+  font-size: 30rpx;
+  line-height: 1.6;
+  height: 72rpx;
+}
+.ph {
+  color: var(--muted);
+  font-size: 30rpx;
+}
+.input-area .send-btn {
+  flex: none;
+  margin-left: 16rpx;
+  background: var(--cinnabar);
+  border-color: var(--cinnabar);
+  color: #fff;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 28rpx;
+  font-size: 28rpx;
+  border-radius: 12rpx;
+}
