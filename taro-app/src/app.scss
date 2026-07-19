@@ -1,36 +1,62 @@
-// 全局基础样式：引入主题变量（theme.scss 通过 config.sass.resource 全局注入，
-// 这里再兜底引入一次以保证 H5 入口也能拿到变量）
+// 全局基础样式
 @import './styles/theme.scss';
 
 page,
 body {
-  background: var(--ink);
+  background-color: var(--paper);
   color: var(--cream);
-  font-family: -apple-system, 'PingFang SC', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  color-scheme: light;
+  font-family: var(--font-body);
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(181, 52, 46, 0.03), transparent 42%),
+    radial-gradient(circle at 82% 78%, rgba(61, 86, 68, 0.04), transparent 46%),
+    radial-gradient(circle at 60% 10%, rgba(179, 146, 74, 0.04), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(100, 80, 55, 0.018) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 38px,
+      rgba(100, 80, 55, 0.012) 38px,
+      rgba(100, 80, 55, 0.012) 40px
+    );
+  background-attachment: fixed;
 }
 
-/* ===== 桌面端适配（网页布局）=====
-   手机端（< 768px）保持整屏铺满、底部 tabBar；电脑端改为居中的「网页内容列」
-   （更宽的 max-width），两侧留出页面底色，并把底部 tabBar 变为顶部导航。
-   根字号在桌面端固定为网页舒适值，由 src/utils/fit-viewport.js 控制。 */
+/* 桌面端适配 */
 @media (min-width: 768px) {
   html,
   body {
-    background: #0e0c0a; /* 列外底色，与列内 --ink 区分 */
+    background-color: var(--paper-2);
   }
   #app {
     position: relative;
-    max-width: 1000px; /* 网页舒适内容宽度 */
-    margin: 0 auto;
     min-height: 100vh;
-    height: 100vh;
-    background: var(--ink);
-    box-shadow: 0 0 80rpx rgba(0, 0, 0, 0.5);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(circle at 18% 22%, rgba(181, 52, 46, 0.03), transparent 42%),
+      radial-gradient(circle at 82% 78%, rgba(61, 86, 68, 0.04), transparent 46%),
+      radial-gradient(circle at 60% 10%, rgba(179, 146, 74, 0.04), transparent 40%),
+      repeating-linear-gradient(0deg, rgba(100, 80, 55, 0.018) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 38px,
+        rgba(100, 80, 55, 0.012) 38px,
+        rgba(100, 80, 55, 0.012) 40px
+      );
+    box-shadow: 0 0 80rpx rgba(60, 45, 20, 0.15);
     overflow-x: hidden;
-    overflow-y: auto;
   }
-  /* 桌面端顶部导航为 fixed，内容需下方留出导航高度 */
   .page {
-    padding-top: 104rpx !important;
+    margin-left: 300px;
+    padding: 72rpx 64rpx;
+    max-width: 800px;
+    min-height: 100vh;
   }
+}
+
+textarea,
+input {
+  background: transparent;
+  color: var(--cream);
 }

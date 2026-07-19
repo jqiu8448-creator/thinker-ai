@@ -1,76 +1,186 @@
+/* ===== Tabbar / 侧栏（古风宣纸书卷风）=====
+   手机端：底部固定 tabBar（仅导航）。
+   电脑端（≥768px）：固定左侧栏。 */
+
 .tabbar {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 50;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+}
+.sb-head {
+  display: none;
+}
+.sb-brand {
+  font-size: 34px;
+  color: var(--seal);
+  font-family: var(--font-display);
+  letter-spacing: 4px;
+}
+.sb-brand-sub {
+  margin-top: 4px;
+  font-size: 20px;
+  color: var(--ink-faint);
+  letter-spacing: 1px;
+}
+.sb-nav {
   display: flex;
   height: 96px;
   padding-bottom: env(safe-area-inset-bottom);
-  background: var(--ink);
-  border-top: 1px solid var(--line);
-  z-index: 50;
 }
-.tab-brand {
-  display: none; /* 手机端隐藏，桌面端作为顶部品牌 */
-}
-.tab-items {
-  display: flex;
-  flex: 1;
-  width: 100%;
+.sb-recent {
+  display: none;
 }
 .tab-item {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 .tab-label {
   font-size: 26px;
-  color: var(--muted);
+  color: var(--ink-soft);
   letter-spacing: 2px;
 }
 .tab-item.on .tab-label {
-  color: var(--gold);
+  color: var(--seal);
 }
 
-/* 桌面端：底部 tabBar → 顶部导航栏（fixed 固定在居中列顶端，不受页面 padding 影响） */
+/* ===== 桌面端：左侧书卷目录 ===== */
 @media (min-width: 768px) {
   .tabbar {
-    position: fixed;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 1000px;
-    bottom: auto;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    height: 88px;
-    padding: 0 32rpx;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel-2);
     border-top: none;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 0;
   }
-  .tab-brand {
+  .sb-head {
     display: flex;
     align-items: center;
-    font-size: 34rpx;
-    color: var(--gold);
-    letter-spacing: 3rpx;
+    gap: 18px;
+    padding: 28px 24px;
+    border-bottom: 1px solid var(--line);
   }
-  .tab-items {
+  .sb-seal {
     flex: none;
-    width: auto;
+    width: 68px;
+    height: 68px;
+    font-size: 40px;
+    letter-spacing: 0;
+    border-radius: 12rpx;
+    background: var(--seal);
+    color: var(--paper);
     display: flex;
-    gap: 12rpx;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .sb-seal:hover {
+    transform: scale(1.06);
+  }
+  .sb-nav {
+    flex: none;
+    flex-direction: column;
+    height: auto;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    gap: 0;
   }
   .tab-item {
     flex: none;
-    padding: 0 28rpx;
-    height: 88px;
+    justify-content: flex-start;
+    height: 56px;
+    padding: 0 24px;
+    border-left: 3px solid transparent;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .tab-item:hover {
+    background: var(--paper-card);
+  }
+  .tab-item.on {
+    border-left-color: var(--seal);
+    background: var(--paper-card);
+    box-shadow: inset 3px 0 8px rgba(181, 52, 46, 0.08);
+  }
+  .tab-item.on .tab-label {
+    color: var(--seal);
   }
   .tab-label {
-    font-size: 30rpx;
+    font-size: 28px;
+    font-family: var(--font-display);
+    color: var(--ink-soft);
+  }
+  .sb-recent {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 22px 0 28px;
+  }
+  .sb-recent-head {
+    padding: 0 24px 12px;
+    font-size: 22px;
+    color: var(--ink-faint);
+    letter-spacing: 3px;
+    font-family: var(--font-display);
+  }
+  .sb-recent-empty {
+    padding: 0 24px;
+    font-size: 24px;
+    color: var(--ink-faint);
+  }
+  .sb-session {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .sb-session:hover {
+    background: var(--paper-card);
+    border-left-color: var(--jade);
+    transform: translateX(3px);
+  }
+  .sb-session-main {
+    min-width: 0;
+    flex: 1;
+  }
+  .sb-session-name {
+    font-size: 28px;
+    color: var(--cream);
+    font-family: var(--font-display);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sb-session-prev {
+    margin-top: 6px;
+    font-size: 22px;
+    color: var(--ink-faint);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sb-session-time {
+    flex: none;
+    font-size: 20px;
+    color: var(--ink-faint);
+    margin-top: 4px;
   }
 }

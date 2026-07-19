@@ -1,27 +1,87 @@
-/* 思想家AI 全局主题变量（从原生小程序 app.wxss 搬运） */
+/* 思想家AI 主题——古风宣纸/墨/朱砂/黛青
+   变量「角色」保持不变，仅把取值改为纸/墨配色，从而让所有页面自动换肤。 */
 page,
 body {
-  --ink: #1a1714;
-  --panel: #241f18;
-  --panel-2: #2b251c;
-  --gold: #c8a45c;
-  --gold-soft: #d4b06a;
-  --gold-deep: #b88f3e;
-  --gold-bright: #e8c06a;
-  --cream: #e8dcc0;
-  --muted: #a89878;
-  --muted-2: #8a7c5e;
-  --line: #4a3f2e;
-  --cinnabar: #9e4a3c;
-  --teal: #4a7c6f;
-  --line-2: #322b20;
-  --cream-soft: #c8b89a;
-  --cream-bright: #f3e9d2;
-  --input-bg: #211c17;
+  /* 旧角色 → 新纸墨取值 */
+  --ink: #f7f1e0;
+  --cream: #2a241c;
+  --panel: #fdfaf2;
+  --panel-2: #ede3cc;
+  --gold: #b5342e;
+  --gold-soft: #d4645a;
+  --gold-deep: #8b221c;
+  --gold-bright: #b5342e;
+  --muted: #8a7d68;
+  --muted-2: #b0a58e;
+  --line: #e0d5bc;
+  --line-2: #ede3cc;
+  --cinnabar: #b5342e;
+  --teal: #3d5644;
+  --cream-soft: #5c5344;
+  --cream-bright: #fdfaf2;
+  --input-bg: #ede3cc;
+  --paper: #f7f1e0;
+  --paper-2: #ede3cc;
+  --card: #fdfaf2;
+  --card-2: #ede3cc;
+  --ink-soft: #5c5344;
+  --ink-faint: #8a7d68;
+  --seal: #b5342e;
+  --seal-deep: #8b221c;
+  --seal-soft: #d4645a;
+  --jade: #3d5644;
+  --jade-soft: #5a7a64;
+  --bronze: #b3924a;
+  --paper-card: #fdfaf2;
+  --paper-deep: #ede3cc;
+  --line-soft: #ede3cc;
+
+  /* 新增设计令牌 */
+  --font-display: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --radius-sm: 8rpx;
+  --radius-md: 14rpx;
+  --radius-lg: 20rpx;
+  --shadow-card: 0 2rpx 12rpx rgba(60, 45, 20, 0.06);
+  --shadow-raised: 0 6rpx 24rpx rgba(60, 45, 20, 0.10);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.15s;
+  --dur-normal: 0.25s;
 }
 
-/* 衬线/楷体标题类（跨端通用） */
+/* 衬线/楷体标题类 */
 .kai {
-  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'KaiTi', serif;
+  font-family: var(--font-display);
   letter-spacing: 2rpx;
+}
+
+/* 朱砂印章块 */
+.seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--seal);
+  color: var(--paper);
+  border-radius: 10rpx;
+  font-family: var(--font-display);
+  box-shadow: var(--shadow-card);
+}
+
+/* 消息入场动画 */
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(12rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 闪烁光标（流式输出用） */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 磨墨动画 */
+@keyframes ink-spread {
+  0% { box-shadow: 0 0 0 0 rgba(181, 52, 46, 0.25); transform: scale(0.8); }
+  50% { box-shadow: 0 0 0 12rpx rgba(181, 52, 46, 0.08); transform: scale(1); }
+  100% { box-shadow: 0 0 0 24rpx rgba(181, 52, 46, 0); transform: scale(0.8); }
 }

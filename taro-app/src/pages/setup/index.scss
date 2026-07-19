@@ -1,9 +1,13 @@
 .setup {
   min-height: 100vh;
-  background: #1a1714;
+  background: var(--paper);
   padding: 80px 40px 60px;
   box-sizing: border-box;
-  color: #e8dcc0;
+  color: var(--cream);
+  font-family: var(--font-display);
+  background-image:
+    radial-gradient(circle at 20% 18%, rgba(181, 52, 46, 0.04), transparent 45%),
+    radial-gradient(circle at 80% 82%, rgba(61, 86, 68, 0.05), transparent 48%);
 }
 
 .s-brand {
@@ -12,48 +16,49 @@
 }
 .s-title {
   font-size: 56px;
-  color: #c8a45c;
+  color: var(--seal);
   letter-spacing: 4px;
 }
 .s-sub {
   margin-top: 16px;
   font-size: 26px;
-  color: #8a7c5e;
+  color: var(--ink-faint);
 }
 
 .s-card {
-  background: #211c17;
-  border: 1px solid #3a3225;
-  border-radius: 20px;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
   padding: 40px 36px;
+  box-shadow: var(--shadow-card);
 }
 .s-card-title {
   font-size: 34px;
-  color: #c8a45c;
+  color: var(--seal);
   margin-bottom: 16px;
 }
 .s-tip {
   font-size: 24px;
   line-height: 1.7;
-  color: #a89a7c;
+  color: var(--ink-faint);
   margin-bottom: 36px;
 }
 
 .s-label {
   font-size: 26px;
-  color: #d4b06a;
+  color: var(--seal);
   margin: 28px 0 12px;
 }
 .s-input {
-  background: #16130f;
-  border: 1px solid #3a3225;
+  background: var(--input-bg);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 22px 24px;
   font-size: 28px;
-  color: #e8dcc0;
+  color: var(--cream);
 }
 .s-ph {
-  color: #5a5040;
+  color: var(--ink-faint);
 }
 
 .s-test {
@@ -61,8 +66,8 @@
 }
 .s-test-btn {
   background: transparent;
-  border: 1px solid #c8a45c;
-  color: #c8a45c;
+  border: 1px solid var(--seal);
+  color: var(--seal);
   border-radius: 12px;
   font-size: 28px;
 }
@@ -70,22 +75,32 @@
   display: block;
   margin-top: 18px;
   font-size: 24px;
-  color: #a89a7c;
+  color: var(--ink-faint);
   line-height: 1.6;
 }
 
 .s-save {
   margin-top: 48px;
-  background: linear-gradient(90deg, #c8a45c, #b8923f);
-  color: #1a1714;
-  border-radius: 14px;
+  background: var(--seal);
+  color: var(--paper);
+  border-radius: var(--radius-md);
   font-size: 32px;
   font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(139, 34, 28, 0.25);
 }
 
 .s-foot {
   margin-top: 40px;
   text-align: center;
   font-size: 22px;
-  color: #5a5040;
+  color: var(--ink-faint);
+}
+
+/* 桌面端 */
+@media (min-width: 768px) {
+  .setup {
+    margin-left: 300px;
+    max-width: 640px;
+    margin-right: auto;
+  }
 }

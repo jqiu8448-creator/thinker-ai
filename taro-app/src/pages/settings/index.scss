@@ -2,13 +2,13 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--ink);
+  background: var(--paper);
   padding: 0;
 }
 .hint {
   flex: none;
   font-size: 28rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   text-align: center;
   padding: 22rpx 0 18rpx;
   letter-spacing: 2rpx;
@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted);
+  color: var(--ink-faint);
   font-size: 28rpx;
 }
 .list {
@@ -29,11 +29,12 @@
 }
 
 .item {
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: 26rpx 28rpx;
   margin-bottom: 20rpx;
+  box-shadow: var(--shadow-card);
 }
 .row1 {
   display: flex;
@@ -42,19 +43,20 @@
 }
 .t-name {
   font-size: 36rpx;
-  color: var(--gold);
+  color: var(--seal);
+  font-family: var(--font-display);
   letter-spacing: 2rpx;
 }
 .t-mode {
   font-size: 24rpx;
-  color: var(--teal);
-  border: 1px solid var(--teal);
+  color: var(--jade);
+  border: 1px solid var(--jade-soft);
   border-radius: 20rpx;
   padding: 2rpx 16rpx;
 }
 .t-preview {
   font-size: 26rpx;
-  color: var(--cream);
+  color: var(--ink-soft);
   line-height: 1.6;
   margin-top: 14rpx;
   display: -webkit-box;
@@ -69,7 +71,7 @@
 }
 .t-topic {
   font-size: 24rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -77,16 +79,16 @@
 }
 .t-turns {
   font-size: 22rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   margin-right: 20rpx;
 }
 .t-time {
   font-size: 22rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
 }
 .empty {
   text-align: center;
-  color: var(--muted);
+  color: var(--ink-faint);
   padding: 80rpx 0;
   font-size: 28rpx;
 }
@@ -96,9 +98,9 @@
   flex: none;
   margin: 4rpx 24rpx 8rpx;
   padding: 22rpx 28rpx;
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
 }
 .setting-row {
   display: flex;
@@ -120,8 +122,8 @@
   line-height: 56rpx;
   text-align: center;
   font-size: 40rpx;
-  color: var(--gold);
-  background: var(--panel-2);
+  color: var(--seal);
+  background: var(--paper-deep);
   border: 1px solid var(--line);
   border-radius: 10rpx;
 }
@@ -129,11 +131,11 @@
   min-width: 70rpx;
   text-align: center;
   font-size: 32rpx;
-  color: var(--gold);
+  color: var(--seal);
 }
 .setting-tip {
   font-size: 21rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   margin-top: 12rpx;
   letter-spacing: 1rpx;
 }
@@ -143,12 +145,12 @@
 }
 .sv-text {
   font-size: 26rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   letter-spacing: 1rpx;
 }
 .sv-arrow {
   font-size: 36rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   margin-left: 12rpx;
   line-height: 1;
 }
@@ -158,33 +160,33 @@
   flex: none;
   white-space: nowrap;
   padding: 12rpx 18rpx;
-  border-bottom: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line);
 }
 .filter {
   display: inline-block;
   font-size: 24rpx;
-  color: var(--muted);
-  background: var(--panel-2);
+  color: var(--ink-faint);
+  background: var(--paper-deep);
   border: 1px solid var(--line);
   border-radius: 24rpx;
   padding: 8rpx 22rpx;
   margin: 0 10rpx;
 }
 .filter.on {
-  color: var(--ink);
-  background: var(--gold);
-  border-color: var(--gold);
+  color: var(--paper);
+  background: var(--seal);
+  border-color: var(--seal);
 }
 
 /* 列表项内的星标与标签 */
 .t-fav {
   font-size: 38rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   margin-left: 14rpx;
   padding: 0 8rpx;
 }
 .t-fav.on {
-  color: var(--gold);
+  color: var(--seal);
 }
 .tags {
   display: flex;
@@ -193,8 +195,8 @@
 }
 .tag {
   font-size: 21rpx;
-  color: var(--gold-soft);
-  background: var(--panel-2);
+  color: var(--seal-soft);
+  background: var(--paper-deep);
   border: 1px solid var(--line);
   border-radius: 8rpx;
   padding: 4rpx 14rpx;
@@ -210,23 +212,23 @@
   height: 88rpx;
   padding: 0 36rpx;
   border-bottom: 1px solid var(--line);
-  background: var(--ink);
+  background: var(--paper);
 }
 .ed-title {
   font-size: 30rpx;
-  color: var(--gold);
+  color: var(--seal);
   letter-spacing: 3rpx;
 }
 .ed-close {
   font-size: 40rpx;
   line-height: 1;
-  color: var(--muted);
+  color: var(--ink-faint);
   padding: 8rpx 16rpx;
 }
 .ed-label {
   display: block;
   font-size: 24rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   letter-spacing: 2rpx;
   margin-bottom: 16rpx;
 }
@@ -241,12 +243,12 @@
   line-height: 1.4;
 }
 .ed-ph {
-  color: var(--muted-2);
+  color: var(--ink-faint);
   font-size: 26rpx;
 }
 .ed-foot {
   flex: none;
-  background: var(--ink);
+  background: var(--paper);
   padding: 16rpx 36rpx 40rpx;
   border-top: 1px solid var(--line);
 }
@@ -255,7 +257,8 @@
 .func-title {
   flex: none;
   font-size: 30rpx;
-  color: var(--gold);
+  color: var(--seal);
+  font-family: var(--font-display);
   letter-spacing: 3rpx;
   margin: 8rpx 24rpx 16rpx;
 }
@@ -280,8 +283,8 @@
   align-items: center;
   justify-content: center;
   font-size: 40rpx;
-  color: var(--gold);
-  background: var(--panel);
+  color: var(--seal);
+  background: var(--paper-card);
   border: 1px solid var(--line);
   border-radius: 22rpx;
   margin-bottom: 12rpx;
@@ -293,7 +296,7 @@
 }
 .func-sub {
   font-size: 20rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   margin-top: 4rpx;
   max-width: 150rpx;
   overflow: hidden;
@@ -305,7 +308,7 @@
 .expand-more {
   text-align: center;
   font-size: 26rpx;
-  color: var(--gold);
+  color: var(--seal);
   letter-spacing: 2rpx;
   padding: 28rpx 0 12rpx;
 }
@@ -317,7 +320,7 @@
 .wm-preview {
   margin-top: 24rpx;
   font-size: 26rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   letter-spacing: 1rpx;
 }
 
@@ -330,33 +333,33 @@
   text-align: center;
 }
 .about-logo {
-  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-family: var(--font-display);
   font-size: 46rpx;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--seal);
   letter-spacing: 12rpx;
   text-indent: 12rpx;
   margin-bottom: 24rpx;
 }
 .about-desc {
-  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-size: 27rpx;
-  color: var(--cream-soft);
+  color: var(--ink-soft);
   line-height: 2;
   letter-spacing: 1rpx;
 }
 .about-ver {
   margin-top: 26rpx;
   font-size: 22rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   letter-spacing: 2rpx;
 }
 
 /* 通用抽屉底部按钮 */
 .d-btn {
-  background: var(--gold);
-  color: var(--ink);
+  background: var(--seal);
+  color: var(--paper);
   border: none;
   border-radius: 12rpx;
 }
@@ -376,7 +379,7 @@
 }
 .ai-tip {
   font-size: 21rpx;
-  color: var(--muted-2);
+  color: var(--ink-faint);
   letter-spacing: 1rpx;
   margin-top: 18rpx;
   line-height: 1.6;
@@ -389,7 +392,7 @@
 .ai-test-btn {
   flex: none;
   font-size: 24rpx;
-  background: var(--panel-2);
+  background: var(--paper-deep);
   color: var(--cream);
   border: 1px solid var(--line);
   border-radius: 10rpx;
@@ -400,8 +403,16 @@
 .ai-test-result {
   flex: 1;
   font-size: 22rpx;
-  color: var(--gold-soft);
+  color: var(--seal-soft);
   letter-spacing: 1rpx;
   margin-left: 20rpx;
   word-break: break-all;
+}
+
+/* 桌面端 */
+@media (min-width: 768px) {
+  .page {
+    margin-left: 300px;
+    max-width: 800px;
+  }
 }

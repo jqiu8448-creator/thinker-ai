@@ -1,22 +1,23 @@
 .page {
   min-height: 100vh;
-  background: var(--ink);
+  background: var(--paper);
   padding: 40rpx 32rpx 160rpx;
 }
 
 /* 品牌 */
 .brand {
   text-align: center;
-  margin-bottom: 40rpx;
+  margin-bottom: 36rpx;
 }
 .brand-title {
-  font-size: 56rpx;
-  color: var(--gold);
-  letter-spacing: 6rpx;
+  font-size: 48rpx;
+  color: var(--seal);
+  font-family: var(--font-display);
+  letter-spacing: 4rpx;
 }
 .brand-sub {
-  font-size: 26rpx;
-  color: var(--muted);
+  font-size: 24rpx;
+  color: var(--ink-faint);
   margin-top: 12rpx;
 }
 
@@ -26,19 +27,20 @@
   margin: 18rpx 0 4rpx;
   padding: 12rpx 26rpx;
   font-size: 26rpx;
-  color: var(--gold);
-  background: var(--panel-2);
-  border: 1px solid var(--line);
+  color: var(--seal);
+  background: var(--paper-deep);
+  border: 1px solid var(--line-soft);
   border-radius: 30rpx;
   letter-spacing: 1rpx;
 }
 
 /* 话题输入 */
 .ask-box {
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: 8rpx 20rpx;
+  box-shadow: var(--shadow-card);
 }
 .ask-input {
   width: 100%;
@@ -47,15 +49,17 @@
   font-size: 30rpx;
   line-height: 1.6;
   padding: 16rpx 8rpx;
+  background: transparent;
 }
 .ph {
-  color: var(--muted);
+  color: var(--ink-faint);
 }
 
 /* 模式选择 */
 .mode-label {
   font-size: 28rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
+  font-family: var(--font-display);
   margin: 40rpx 0 18rpx;
   letter-spacing: 2rpx;
 }
@@ -66,42 +70,49 @@
 }
 .mode-chip {
   width: calc(50% - 14rpx);
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  border-radius: 14rpx;
+  border-radius: var(--radius-md);
   padding: 22rpx 20rpx;
   margin-bottom: 24rpx;
+  box-shadow: var(--shadow-card);
+  transition: all var(--dur-fast) var(--ease-out);
 }
 .mode-chip.on {
-  border-color: var(--gold);
-  background: var(--panel-2);
-  box-shadow: 0 0 0 2rpx rgba(200, 164, 92, 0.3) inset;
+  border-color: var(--seal);
+  background: var(--paper-deep);
+  box-shadow: 0 0 0 2rpx rgba(181, 52, 46, 0.2) inset;
 }
 .mc-name {
-  font-size: 34rpx;
-  color: var(--gold);
+  font-size: 32rpx;
+  color: var(--seal);
+  font-family: var(--font-display);
   letter-spacing: 2rpx;
 }
 .mc-desc {
   font-size: 22rpx;
-  color: var(--muted);
+  color: var(--ink-soft);
   margin-top: 8rpx;
   line-height: 1.4;
 }
 
 .ask-btn {
   margin-top: 8rpx;
-  background-color: var(--gold);
-  border-color: var(--gold);
-  color: var(--ink);
+  background-color: var(--seal);
+  border-color: var(--seal-deep);
+  color: var(--paper);
+  border-radius: var(--radius-md);
+  letter-spacing: 3rpx;
+  font-family: var(--font-display);
+  box-shadow: 0 4rpx 16rpx rgba(139, 34, 28, 0.25);
 }
 .ask-btn-hover {
-  opacity: 0.85;
+  background-color: var(--seal-deep);
 }
 
 .loading {
   text-align: center;
-  color: var(--muted);
+  color: var(--ink-faint);
   font-size: 26rpx;
   margin: 30rpx 0;
   display: flex;
@@ -112,37 +123,30 @@
 /* 引荐结果 */
 .rec-head {
   font-size: 30rpx;
-  color: var(--gold);
+  color: var(--seal);
+  font-family: var(--font-display);
   margin: 36rpx 0 20rpx;
   letter-spacing: 2rpx;
 }
 .rec-card {
   display: flex;
   align-items: center;
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  border-radius: 14rpx;
+  border-radius: var(--radius-md);
   padding: 24rpx 22rpx;
   margin-bottom: 18rpx;
+  box-shadow: var(--shadow-card);
+  transition: all var(--dur-fast) var(--ease-out);
 }
 .rec-list {
   display: block;
 }
-/* 桌面端：引荐卡片横向排列 */
-@media (min-width: 768px) {
-  .rec-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18rpx;
-  }
-  .rec-card {
-    flex: 1 1 calc(33.3333% - 18rpx);
-    margin-bottom: 0;
-  }
-}
+.rec-card:hover,
 .rec-hover {
-  border-color: var(--gold);
-  background: var(--panel-2);
+  transform: translateY(-2rpx);
+  box-shadow: var(--shadow-raised);
+  border-color: var(--seal-soft);
 }
 .rec-no {
   width: 48rpx;
@@ -150,8 +154,8 @@
   line-height: 48rpx;
   text-align: center;
   flex: none;
-  color: var(--cream-bright);
-  background: var(--cinnabar);
+  color: var(--paper);
+  background: var(--seal);
   border-radius: 8rpx;
   font-size: 28rpx;
   margin-right: 20rpx;
@@ -163,24 +167,219 @@
 .rec-name {
   font-size: 32rpx;
   color: var(--cream);
+  font-family: var(--font-display);
   letter-spacing: 2rpx;
 }
 .rec-reason {
   font-size: 24rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   margin-top: 8rpx;
   line-height: 1.5;
 }
 .rec-go {
   flex: none;
-  color: var(--gold);
+  color: var(--seal);
   font-size: 30rpx;
   margin-left: 16rpx;
 }
 
 .empty {
   text-align: center;
-  color: var(--muted);
+  color: var(--ink-faint);
   padding: 60rpx 0;
   font-size: 28rpx;
+}
+
+/* ===== 填充区：每日一句 / 推荐问题 / 推荐思想家 ===== */
+.inspire {
+  margin-top: 56rpx;
+  padding-top: 48rpx;
+  border-top: 1px solid var(--line);
+}
+.inspire-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30rpx;
+  color: var(--seal);
+  margin: 40rpx 0 22rpx;
+  letter-spacing: 2rpx;
+  font-family: var(--font-display);
+}
+.inspire-head:first-child {
+  margin-top: 0;
+}
+.inspire-more {
+  font-size: 24rpx;
+  color: var(--ink-faint);
+  letter-spacing: 0;
+}
+
+/* 名言卡片 */
+.quote-card {
+  position: relative;
+  background: linear-gradient(160deg, var(--paper-card), var(--paper));
+  border: 1px solid var(--line);
+  border-left: 5rpx solid var(--seal);
+  border-radius: var(--radius-lg);
+  padding: 40rpx 36rpx 32rpx;
+  box-shadow: var(--shadow-card);
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.quote-hover {
+  border-color: var(--seal-soft);
+  transform: translateY(-2rpx);
+  box-shadow: var(--shadow-raised);
+}
+.quote-mark {
+  position: absolute;
+  top: 8rpx;
+  right: 28rpx;
+  font-size: 96rpx;
+  color: rgba(181, 52, 46, 0.10);
+  line-height: 1;
+}
+.quote-text {
+  font-size: 36rpx;
+  color: var(--cream);
+  line-height: 1.8;
+  letter-spacing: 1rpx;
+}
+.quote-src {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--seal-soft);
+  text-align: right;
+}
+
+/* 推荐问题 */
+.q-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.q-chip {
+  padding: 16rpx 26rpx;
+  font-size: 26rpx;
+  color: var(--ink-soft);
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 30rpx;
+  line-height: 1.4;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.q-chip:hover,
+.q-chip:active {
+  border-color: var(--seal);
+  background: var(--paper-deep);
+  color: var(--seal);
+}
+
+/* 推荐思想家 */
+.feat-list {
+  display: block;
+}
+.feat-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 26rpx 24rpx;
+  margin-bottom: 18rpx;
+  box-shadow: var(--shadow-card);
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.feat-card:hover {
+  transform: translateY(-2rpx);
+  box-shadow: var(--shadow-raised);
+}
+.feat-hover {
+  border-color: var(--seal-soft);
+  background: var(--paper-deep);
+  transform: translateY(-2rpx);
+  box-shadow: var(--shadow-raised);
+}
+.feat-name {
+  font-size: 34rpx;
+  color: var(--seal);
+  font-family: var(--font-display);
+  letter-spacing: 2rpx;
+}
+.feat-tag {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.feat-field {
+  margin-top: 12rpx;
+  align-self: flex-start;
+  font-size: 20rpx;
+  color: var(--ink-faint);
+  border: 1px solid var(--line);
+  border-radius: 20rpx;
+  padding: 4rpx 16rpx;
+}
+
+/* 桌面端 */
+@media (min-width: 768px) {
+  .brand {
+    text-align: left;
+    margin-bottom: 32rpx;
+  }
+  .brand-title {
+    font-size: 56rpx;
+  }
+  .brand-sub {
+    font-size: 26rpx;
+  }
+  .ask-box {
+    padding: 12rpx 28rpx;
+  }
+  .ask-input {
+    height: 200rpx;
+    font-size: 34rpx;
+  }
+  .modes {
+    gap: 20rpx;
+  }
+  .mode-chip {
+    padding: 28rpx 26rpx;
+  }
+  .mc-name {
+    font-size: 38rpx;
+  }
+  .rec-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18rpx;
+  }
+  .rec-card {
+    flex: 1 1 calc(33.3333% - 18rpx);
+    margin-bottom: 0;
+  }
+  .inspire {
+    margin-top: 64rpx;
+    padding-top: 56rpx;
+  }
+  .quote-text {
+    font-size: 44rpx;
+  }
+  .feat-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20rpx;
+  }
+  .feat-card {
+    margin-bottom: 0;
+    padding: 30rpx 28rpx;
+  }
+  .feat-name {
+    font-size: 38rpx;
+  }
+  .q-chip {
+    font-size: 28rpx;
+    padding: 18rpx 30rpx;
+  }
 }

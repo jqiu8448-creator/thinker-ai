@@ -2,17 +2,17 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--ink);
+  background: var(--paper);
 }
 
-/* 桌面端顶部条（手机端隐藏，沿用系统导航） */
+/* 桌面端顶部条 */
 .chat-top {
   display: none;
 }
 
 .chat-area {
   flex: 1;
-  padding: 24rpx;
+  padding: 32rpx;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -24,12 +24,13 @@
   min-width: 0;
   margin-bottom: 24rpx;
   padding: 20rpx 24rpx;
-  border-radius: 16rpx;
-  font-size: 30rpx;
-  line-height: 1.7;
+  border-radius: var(--radius-md);
+  font-size: 28rpx;
+  line-height: 1.8;
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
+  animation: message-in 0.3s var(--ease-out) both;
 }
 .msg .content {
   word-break: break-word;
@@ -39,35 +40,57 @@
 .msg.user {
   align-self: flex-end;
   margin-left: auto;
-  background: rgba(158, 74, 60, 0.22);
-  border: 1px solid var(--cinnabar);
+  background: rgba(61, 86, 68, 0.10);
+  border: 1px solid var(--jade-soft);
+  border-right: 4rpx solid var(--jade);
+  color: var(--cream);
 }
 .msg.assistant {
   align-self: flex-start;
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
+  border-left: 4rpx solid var(--seal);
+  box-shadow: var(--shadow-card);
+  color: var(--cream);
 }
 .msg.assistant .thinker-label {
   font-size: 26rpx;
-  color: var(--gold);
+  color: var(--seal);
+  font-family: var(--font-display);
   letter-spacing: 2rpx;
   margin-bottom: 12rpx;
 }
 .stream-cursor {
-  color: var(--gold);
+  color: var(--seal);
   font-weight: normal;
   margin-left: 2rpx;
-  animation: blink 1s steps(1) infinite;
+  animation: blink-cursor 1s step-end infinite;
 }
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
+
+.typing {
+  color: var(--ink-faint);
+  font-size: 28rpx;
+  font-style: italic;
+  padding: 12rpx 0;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
 }
+.typing::before {
+  content: '';
+  display: inline-block;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: var(--seal);
+  animation: ink-spread 1.6s var(--ease-out) infinite;
+}
+
 .msg.system {
   align-self: center;
   max-width: 90%;
   text-align: center;
-  color: var(--muted);
+  color: var(--ink-faint);
   font-size: 26rpx;
   font-style: italic;
   background: transparent;
@@ -79,19 +102,19 @@
 .msg.multi {
   align-self: flex-start;
   max-width: 94%;
-  background: var(--panel);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  border-left: 6rpx solid var(--gold);
+  border-left: 4rpx solid var(--gold);
 }
 .msg.multi .multi-head {
   font-size: 26rpx;
-  color: var(--gold);
+  color: var(--seal);
   letter-spacing: 2rpx;
   margin-bottom: 16rpx;
 }
 .bubble {
-  background: var(--ink);
-  border: 1px solid var(--line);
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
   border-radius: 12rpx;
   padding: 16rpx 20rpx;
   margin-bottom: 16rpx;
@@ -101,11 +124,11 @@
 }
 .b-name {
   font-size: 26rpx;
-  color: var(--gold);
+  color: var(--seal);
   margin-bottom: 8rpx;
 }
 .round-tag {
-  color: var(--teal);
+  color: var(--jade);
   font-size: 22rpx;
   margin-left: 12rpx;
   font-family: 'Songti SC', serif;
@@ -132,23 +155,17 @@
   opacity: 0.7;
 }
 .welcome .w-title {
-  color: var(--gold);
+  color: var(--seal);
   font-size: 48rpx;
+  font-family: var(--font-display);
   margin: 20rpx 0;
   letter-spacing: 4rpx;
 }
 .welcome .w-desc {
   font-size: 28rpx;
-  color: var(--muted);
+  color: var(--ink-faint);
   max-width: 560rpx;
   line-height: 1.8;
-}
-
-.typing {
-  color: var(--muted);
-  font-size: 28rpx;
-  font-style: italic;
-  padding: 12rpx 0;
 }
 
 /* 输入区 */
@@ -156,30 +173,30 @@
   display: flex;
   align-items: center;
   padding: 20rpx 24rpx;
-  background: var(--panel);
+  background: var(--paper-card);
   border-top: 1px solid var(--line);
 }
 .input-area .input {
   flex: 1;
-  background: var(--panel-2);
+  background: var(--paper-deep);
   color: var(--cream);
   border: 1px solid var(--line);
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   padding: 16rpx 24rpx;
   font-size: 30rpx;
   line-height: 1.6;
   height: 72rpx;
 }
 .ph {
-  color: var(--muted);
+  color: var(--ink-faint);
   font-size: 30rpx;
 }
 .input-area .send-btn {
   flex: none;
   margin-left: 16rpx;
-  background: var(--cinnabar);
-  border-color: var(--cinnabar);
-  color: #fff;
+  background: var(--seal);
+  border-color: var(--seal);
+  color: var(--paper);
   height: 72rpx;
   line-height: 72rpx;
   padding: 0 28rpx;
@@ -187,11 +204,12 @@
   border-radius: 12rpx;
 }
 
-/* 桌面端：对话列居中、限制阅读宽度，并显示顶部条 */
+/* 桌面端 */
 @media (min-width: 768px) {
   .container {
-    max-width: 860px;
-    margin: 0 auto;
+    margin-left: 300px;
+    width: calc(100% - 300px);
+    height: 100vh;
   }
   .chat-top {
     display: flex;
@@ -199,22 +217,29 @@
     height: 88px;
     padding: 0 32rpx;
     border-bottom: 1px solid var(--line);
-    background: var(--panel);
+    background: var(--paper);
   }
   .chat-top .ct-brand {
     font-size: 34rpx;
-    color: var(--gold);
+    color: var(--seal);
+    font-family: var(--font-display);
     letter-spacing: 3rpx;
   }
   .chat-top .ct-back {
     margin-right: 20rpx;
     font-size: 30rpx;
-    color: var(--muted);
+    color: var(--ink-faint);
   }
   .chat-top .ct-title {
     flex: 1;
     font-size: 30rpx;
     color: var(--cream);
     letter-spacing: 2rpx;
+  }
+  .chat-area,
+  .input-area {
+    max-width: 760px;
+    margin: 0 auto;
+    width: 100%;
   }
 }

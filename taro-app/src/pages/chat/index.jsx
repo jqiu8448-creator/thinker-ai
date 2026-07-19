@@ -4,6 +4,7 @@ import Taro, { useRouter } from '@tarojs/taro';
 import { callCloud } from '@/utils/cloud';
 import { getGlobal } from '@/utils/global';
 import { ensureApiConfig } from '@/utils/api-config';
+import Tabbar from '@/components/tabbar';
 import './index.scss';
 
 function modeName(mode) {
@@ -168,7 +169,9 @@ export default function Chat() {
   };
 
   return (
-    <View className="container">
+    <>
+      <Tabbar current="" />
+      <View className="container">
       <View className="chat-top">
         <View className="ct-back" onClick={onBack}>
           ‹ 返回
@@ -259,5 +262,6 @@ export default function Chat() {
         </Button>
       </View>
     </View>
+    </>
   );
 }
