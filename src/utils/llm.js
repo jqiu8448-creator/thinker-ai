@@ -3,7 +3,11 @@
 // - generateText：非流式，返回完整文本（推荐/多人模式等一次性结果用）。
 // - generateTextStream：流式，边收边回调 onToken(delta)，结束时返回完整文本；
 //   对不支持流式的接口自动降级为非流式（仍会一次性把全文通过 onToken 给出）。
+//
+// 托管模式（window.__HOSTED__.hosted === true）下，所有请求走后端 /api/chat，
+// API key 由后端持有，前端不接触。
 import { getApiConfig } from './api-config';
+import { isHosted, hostedHeaders } from './hosted';
 
 /**
  * 调用 chat/completions，返回助手回复文本。
@@ -14,6 +18,9 @@ import { getApiConfig } from './api-config';
  * @param {number} [opts.topP]
  */
 export async function generateText({ model, messages, temperature = 0.7, topP = 0.9, maxTokens, signal }) {
+  if (isHosted()) {
+    return await generateTextHosted({ messages, temperature, topP, maxTokens, signal });
+  }
   const cfg = getApiConfig();
   if (!cfg || !cfg.baseUrl || !cfg.apiKey) {
     throw new Error('尚未配置 API（请在设置中填写 Base URL 与 API Key）');
@@ -75,6 +82,9 @@ export async function generateText({ model, messages, temperature = 0.7, topP = 
  * @param {AbortSignal} [opts.signal]
  */
 export async function generateTextStream({ model, messages, temperature = 0.7, topP = 0.9, maxTokens, onToken, signal }) {
+  if (isHosted()) {
+    return await generateTextStreamHosted({ messages, temperature, topP, maxTokens, onToken, signal });
+  }
   const cfg = getApiConfig();
   if (!cfg || !cfg.baseUrl || !cfg.apiKey) {
     throw new Error('尚未配置 API（请在设置中填写 Base URL 与 API Key）');
@@ -185,6 +195,14 @@ export async function generateTextStream({ model, messages, temperature = 0.7, t
  * @param {{baseUrl,apiKey,model}} [probe] 允许传入未保存的配置预验证
  */
 export async function testConnection(probe) {
+  // 托管模式：后端已配置好 API，前端不需要测试
+  if (isHosted()) {
+    const cfg = (typeof window !== 'undefined' && window.__HOSTED__) || {};
+    if (cfg.llmConfigured === false) {
+      throw new Error('后端未配置 LLM API，请联系管理员');
+    }
+    return `托管模式已就绪（模型 ${cfg.model || 'unknown'}）`;
+  }
   const cfg = probe || getApiConfig();
   if (!cfg || !cfg.baseUrl || !cfg.apiKey) {
     throw new Error('请先填写 Base URL 与 API Key');
@@ -247,4 +265,114 @@ export function extractJson(text) {
   } catch (e) {
     return null;
   }
+}
+
+// ============ 托管模式实现 ============
+
+// SSE 解析通用逻辑（与后端 streamChat 配合）
+// /api/chat 始终返回 text/event-stream，前端读取并合并增量
+async function readSSEStream(resp, onToken) {
+  if (!resp.body || !resp.body.getReader) {
+    // 非流式响应兜底
+    const text = await resp.text();
+    if (onToken) onToken(text);
+    return text;
+  }
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+  let full = '';
+
+  const consumeLine = (rawLine) => {
+    const line = rawLine.trim();
+    if (!line || !line.startsWith('data:')) return;
+    const payload = line.slice(5).trim();
+    if (payload === '[DONE]' || payload === '') return;
+    if (payload.startsWith('[ERROR]')) {
+      throw new Error(payload.slice(7).trim() || '后端流式错误');
+    }
+    let json;
+    try {
+      json = JSON.parse(payload);
+    } catch (e) {
+      return;
+    }
+    const delta = json?.choices?.[0]?.delta?.content || json?.choices?.[0]?.message?.content || '';
+    if (delta) {
+      full += delta;
+      if (onToken) onToken(delta);
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let idx;
+    while ((idx = buffer.indexOf('\n')) >= 0) {
+      const line = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 1);
+      consumeLine(line);
+    }
+  }
+  if (buffer.trim()) consumeLine(buffer);
+  return full;
+}
+
+// 托管模式：非流式调用（等价于读完全部 SSE 后返回完整文本）
+async function generateTextHosted({ messages, temperature, topP, maxTokens, signal }) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  if (signal) signal.addEventListener('abort', () => controller.abort());
+
+  let resp;
+  try {
+    resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: hostedHeaders(),
+      body: JSON.stringify({ messages, temperature, topP, maxTokens }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!resp.ok) {
+    let detail = '';
+    try {
+      detail = (await resp.text()).slice(0, 300);
+    } catch (e) {}
+    throw new Error(`后端 HTTP ${resp.status}：${detail}`);
+  }
+
+  return await readSSEStream(resp, null);
+}
+
+// 托管模式：流式调用
+async function generateTextStreamHosted({ messages, temperature, topP, maxTokens, onToken, signal }) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 300000); // 流式 5 分钟
+  if (signal) signal.addEventListener('abort', () => controller.abort());
+
+  let resp;
+  try {
+    resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: hostedHeaders(),
+      body: JSON.stringify({ messages, temperature, topP, maxTokens }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!resp.ok) {
+    let detail = '';
+    try {
+      detail = (await resp.text()).slice(0, 300);
+    } catch (e) {}
+    throw new Error(`后端 HTTP ${resp.status}：${detail}`);
+  }
+
+  return await readSSEStream(resp, onToken);
 }

@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, Input, Button } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { getApiConfig, setApiConfig } from '@/utils/api-config';
 import { testConnection } from '@/utils/llm';
+import { isHosted } from '@/utils/hosted';
 import './index.scss';
 
 export default function Setup() {
+  // 托管模式：访客无需配置，直接回首页
+  useEffect(() => {
+    if (isHosted()) {
+      Taro.reLaunch({ url: '/pages/home/index' });
+    }
+  }, []);
   const [saved] = useState(() => getApiConfig() || {});
   const [baseUrl, setBaseUrl] = useState(saved.baseUrl || '');
   const [apiKey, setApiKey] = useState(saved.apiKey || '');

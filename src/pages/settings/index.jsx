@@ -5,6 +5,7 @@ import { callCloud } from '@/utils/cloud';
 import { getGlobal, ensureWatermark, FONT_SCALES, getFontScale, setFontScale, applyFontScaleToDom } from '@/utils/global';
 import { ensureApiConfig } from '@/utils/api-config';
 import { modeName } from '@/utils/modes';
+import { isHosted, getHostedConfig, hostedHeaders } from '@/utils/hosted';
 import Popup from '@/components/popup';
 import Tabbar from '@/components/tabbar';
 import './index.scss';
@@ -39,6 +40,10 @@ export default function Settings() {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiTestResult, setAiTestResult] = useState('');
 
+  // 托管模式：剩余配额
+  const [quotaRemaining, setQuotaRemaining] = useState(-1);
+  const [quotaLimit, setQuotaLimit] = useState(3);
+
   // 弹层
   const [showHistory, setShowHistory] = useState(false);
   const [showWatermark, setShowWatermark] = useState(false);
@@ -50,7 +55,25 @@ export default function Settings() {
   const load = () => {
     loadHistory();
     loadWatermark();
-    loadAiConfig();
+    if (isHosted()) {
+      loadQuota();
+    } else {
+      loadAiConfig();
+    }
+  };
+
+  const loadQuota = () => {
+    const cfg = getHostedConfig() || {};
+    setQuotaLimit(cfg.dailyLimit || 3);
+    fetch('/api/quota', { headers: hostedHeaders() })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ok) {
+          setQuotaRemaining(d.remaining);
+          setQuotaLimit(d.limit);
+        }
+      })
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -273,61 +296,86 @@ export default function Settings() {
         <View className="setting-tip">仅作用于对话气泡，自动排版不超出窗口</View>
       </View>
 
-      {/* AI 接口 — 内联展开卡片 */}
-      <View className="setting-card ai-card">
-        <View className="setting-row" onClick={() => setShowAi(!showAi)}>
-          <Text className="setting-label">AI 接口</Text>
-          <View className="setting-value">
-            <Text className="sv-text">{aiProvider === 'custom' ? '自定义 API' : '云开发'}</Text>
-            <Text className="sv-arrow">{showAi ? '⌃' : '›'}</Text>
-          </View>
-        </View>
-        <View className="setting-tip">使用你自己的 OpenAI 兼容接口（保存在本机浏览器）</View>
-
-        {showAi && (
-          <View className="ai-inline">
-            <View className="ai-tip">所有对话将走你填写的接口（保存在本机浏览器，不会上传任何服务器）。</View>
-            <View className="ed-label">Base URL（含 /v1）</View>
-            <Input
-              className="ed-input"
-              placeholder="https://api.deepseek.com/v1"
-              placeholderClass="ed-ph"
-              value={customBaseUrl}
-              onInput={(e) => setCustomBaseUrl(e.detail.value)}
-            />
-            <View className="ed-label">API Key</View>
-            <Input
-              className="ed-input"
-              placeholder="sk-..."
-              placeholderClass="ed-ph"
-              value={customApiKey}
-              onInput={(e) => setCustomApiKey(e.detail.value)}
-            />
-            <View className="ed-label">模型名</View>
-            <Input
-              className="ed-input"
-              placeholder="deepseek-chat"
-              placeholderClass="ed-ph"
-              value={customModel}
-              onInput={(e) => setCustomModel(e.detail.value)}
-            />
-            <View className="ai-test">
-              <Button
-                className="ai-test-btn"
-                loading={aiBusy}
-                disabled={aiBusy}
-                onClick={testAi}
-              >
-                测试连接
-              </Button>
-              {aiTestResult && <Text className="ai-test-result">{aiTestResult}</Text>}
+      {/* AI 接口 — 托管模式 / 自定义模式 */}
+      {isHosted() ? (
+        <View className="setting-card ai-card">
+          <View className="setting-row">
+            <Text className="setting-label">AI 接口</Text>
+            <View className="setting-value">
+              <Text className="sv-text">托管模式</Text>
             </View>
-            <Button className="d-btn ai-save-btn" loading={aiBusy} onClick={saveAi}>
-              保存
-            </Button>
           </View>
-        )}
-      </View>
+          <View className="setting-tip">
+            API 由管理员统一配置，访客无需设置。
+            {(() => {
+              const cfg = getHostedConfig() || {};
+              return cfg.llmConfigured === false ? '（后端尚未配置 LLM，请联系管理员）' : '';
+            })()}
+          </View>
+          <View className="setting-row" style={{ marginTop: '8rpx' }}>
+            <Text className="setting-label">今日剩余</Text>
+            <Text className="sv-text">
+              {quotaRemaining < 0 ? '查询中…' : `${quotaRemaining} / ${quotaLimit} 题`}
+            </Text>
+          </View>
+          <View className="setting-tip">次日 0 点重置 · 按 IP + 浏览器双绑识别</View>
+        </View>
+      ) : (
+        <View className="setting-card ai-card">
+          <View className="setting-row" onClick={() => setShowAi(!showAi)}>
+            <Text className="setting-label">AI 接口</Text>
+            <View className="setting-value">
+              <Text className="sv-text">{aiProvider === 'custom' ? '自定义 API' : '云开发'}</Text>
+              <Text className="sv-arrow">{showAi ? '⌃' : '›'}</Text>
+            </View>
+          </View>
+          <View className="setting-tip">使用你自己的 OpenAI 兼容接口（保存在本机浏览器）</View>
+
+          {showAi && (
+            <View className="ai-inline">
+              <View className="ai-tip">所有对话将走你填写的接口（保存在本机浏览器，不会上传任何服务器）。</View>
+              <View className="ed-label">Base URL（含 /v1）</View>
+              <Input
+                className="ed-input"
+                placeholder="https://api.deepseek.com/v1"
+                placeholderClass="ed-ph"
+                value={customBaseUrl}
+                onInput={(e) => setCustomBaseUrl(e.detail.value)}
+              />
+              <View className="ed-label">API Key</View>
+              <Input
+                className="ed-input"
+                placeholder="sk-..."
+                placeholderClass="ed-ph"
+                value={customApiKey}
+                onInput={(e) => setCustomApiKey(e.detail.value)}
+              />
+              <View className="ed-label">模型名</View>
+              <Input
+                className="ed-input"
+                placeholder="deepseek-chat"
+                placeholderClass="ed-ph"
+                value={customModel}
+                onInput={(e) => setCustomModel(e.detail.value)}
+              />
+              <View className="ai-test">
+                <Button
+                  className="ai-test-btn"
+                  loading={aiBusy}
+                  disabled={aiBusy}
+                  onClick={testAi}
+                >
+                  测试连接
+                </Button>
+                {aiTestResult && <Text className="ai-test-result">{aiTestResult}</Text>}
+              </View>
+              <Button className="d-btn ai-save-btn" loading={aiBusy} onClick={saveAi}>
+                保存
+              </Button>
+            </View>
+          )}
+        </View>
+      )}
 
       {/* 常用功能 */}
       <View className="func-title kai">常用功能</View>

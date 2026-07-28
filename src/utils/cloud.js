@@ -15,6 +15,33 @@ import {
 import * as store from './store';
 import { testConnection } from './llm';
 import { STATES } from './engine-modes';
+import { isHosted, hostedHeaders } from './hosted';
+
+// 托管模式：扣减一次"提问配额"。每次用户发问只扣 1 次，
+// 不论后端为这条问题内部调用了多少次 LLM（如多思想家模式）。
+async function consumeHostedQuota() {
+  try {
+    const resp = await fetch('/api/ask', {
+      method: 'POST',
+      headers: hostedHeaders(),
+      body: JSON.stringify({}),
+    });
+    if (resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      return { ok: true, remaining: data.remaining, limit: data.limit };
+    }
+    if (resp.status === 429) {
+      const data = await resp.json().catch(() => ({}));
+      return { ok: false, error: data.error || '今日配额已用完，明日重置' };
+    }
+    if (resp.status === 503) {
+      return { ok: false, error: '后端未配置 LLM API，请联系管理员' };
+    }
+    return { ok: false, error: `配额检查失败（HTTP ${resp.status}）` };
+  } catch (e) {
+    return { ok: false, error: '网络异常：' + e.message };
+  }
+}
 
 function ok(data) {
   return Object.assign({ ok: true }, data);
@@ -168,6 +195,35 @@ export async function callCloud(action, data = {}, opts = {}) {
         const topic = (data.topic || '').trim();
         if (!message) return finish(fail('消息不能为空'));
         if (!thinker) return finish(fail('请指定思想家'));
+
+        // 托管模式：扣减每日提问配额（每人每天 3 题）
+        if (isHosted()) {
+          const quotaResult = await consumeHostedQuota();
+          if (!quotaResult.ok) {
+            return finish(fail(quotaResult.error || '今日配额已用完'));
+          }
+          // 把剩余配额带上，前端可以提示
+          const session = store.get_or_create_session(data.sessionId);
+          if (topic) session.topic = topic;
+          if (Array.isArray(data.panel) && data.panel.length) {
+            session._panel = data.panel;
+          } else if (data.panel === null) {
+            session._panel = null;
+          }
+          try {
+            const result = await _do_chat(session, {
+              message,
+              thinker,
+              mode,
+              onToken: data.onToken,
+              signal: data.signal,
+            });
+            return finish(ok({ ...result, thinker, mode, sessionId: session.session_id, quotaRemaining: quotaResult.remaining }));
+          } catch (e) {
+            return finish(fail(e.message || '对话失败'));
+          }
+        }
+
         const session = store.get_or_create_session(data.sessionId);
         if (topic) session.topic = topic;
         // 仅在明确传入 panel 时才覆盖，undefined 时保留已有值

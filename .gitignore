@@ -4,3 +4,8 @@ dist/
 *.log
 .DS_Store
 __pycache__/
+
+# 托管模式产生的运行时数据（配额记录、飞书会话）
+.data/
+.env
+

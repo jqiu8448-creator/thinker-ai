@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: thinker-ai
+    runtime: node
+    plan: free
+    region: singapore  # 新加坡节点，国内访问相对友好
+    branch: master
+    healthCheckPath: /health
+    buildCommand: npm install && npm run build:h5
+    startCommand: node server/index.js
+    # Taro H5 构建产物在 dist/（不是 dist/h5/），由 server/index.js 静态 serve
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 18.20.0
+      - key: TZ
+        value: Asia/Shanghai
+      - key: DAILY_LIMIT
+        value: "3"
+      - key: LLM_BASE_URL
+        sync: false  # 在 Render 控制台手动填入（敏感）
+      - key: LLM_API_KEY
+        sync: false  # 在 Render 控制台手动填入（敏感）
+      - key: LLM_MODEL
+        sync: false  # 在 Render 控制台手动填入
+      - key: FEISHU_APP_ID
+        sync: false  # 可选，接入飞书时填
+      - key: FEISHU_APP_SECRET
+        sync: false  # 可选，接入飞书时填
+    # 注：Render 免费层不支持持久磁盘，.data/ 配额数据在重启后会丢失。
+    # 如需持久化，升级 Starter Plan ($7/月) 后取消下面 disk 注释。
+    # disk:
+    #   name: data
+    #   mountPath: /opt/render/project/src/.data
+    #   sizeGB: 1
