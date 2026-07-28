@@ -4,6 +4,7 @@ import Taro, { useRouter, useDidShow, useDidHide } from '@tarojs/taro';
 import { callCloud } from '@/utils/cloud';
 import { getGlobal, applyFontScaleToDom } from '@/utils/global';
 import { ensureApiConfig } from '@/utils/api-config';
+import { isHosted } from '@/utils/hosted';
 import { modeName, fmtTime } from '@/utils/modes';
 import Tabbar from '@/components/tabbar';
 import './index.scss';
@@ -303,8 +304,7 @@ export default function Huiyin() {
         return;
       }
 
-      // 未配置 API 时明确提示，而非静默 return
-      if (!ensureApiConfig()) {
+      if (!isHosted() && !ensureApiConfig()) {
         setMode(m);
         setModeName(modeName(m));
         setWelcome(false);
