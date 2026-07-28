@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# 思想家AI 一键部署脚本（Ubuntu 22.04）
+# 思想家AI 一键部署脚本（支持 Ubuntu 22.04 / TencentOS / CentOS 8+）
 # 用法：ssh 登录服务器后，执行：
 #   bash deploy.sh
 # 可选环境变量：
@@ -13,7 +13,6 @@ PROJECT_DIR="/opt/thinker-ai"
 REPO_URL="https://github.com/jqiu8448-creator/thinker-ai.git"
 NODE_VERSION="20"
 
-# 默认值
 : "${LLM_BASE_URL:=}"
 : "${LLM_API_KEY:=}"
 : "${LLM_MODEL:=deepseek-chat}"
@@ -26,31 +25,43 @@ echo "  服务器: $(hostname)"
 echo "  IP: $(curl -s ifconfig.me || echo 'unknown')"
 echo "========================================="
 
-# --- 0. 检查环境 ---
 if [ "$(id -u)" -ne 0 ]; then
   echo "请用 root 执行：sudo bash deploy.sh"
   exit 1
 fi
 
 if [ ! -f /etc/os-release ]; then
-  echo "无法识别系统，仅支持 Ubuntu 22.04"
+  echo "无法识别系统"
   exit 1
 fi
 
 source /etc/os-release
-if [ "$ID" != "ubuntu" ] || [ "$VERSION_ID" != "22.04" ]; then
-  echo "警告：当前系统 $PRETTY_NAME，脚本基于 Ubuntu 22.04 编写"
-  read -p "是否继续？(y/N): " confirm
-  if [ "$confirm" != "y" ]; then
-    exit 1
-  fi
+echo "  系统: $PRETTY_NAME"
+
+PKG_MGR=""
+if command -v apt-get &>/dev/null; then
+  PKG_MGR="apt"
+elif command -v yum &>/dev/null; then
+  PKG_MGR="yum"
+elif command -v dnf &>/dev/null; then
+  PKG_MGR="dnf"
+else
+  echo "不支持的包管理器"
+  exit 1
 fi
 
-# --- 1. 更新系统 + 装基础工具 ---
+echo "  包管理器: $PKG_MGR"
+
+# --- 1. 装基础工具 ---
 echo ""
-echo "[1/8] 更新系统 + 装基础工具..."
-apt-get update -qq
-apt-get install -y -qq curl wget git nginx certbot python3-certbot-nginx ca-certificates gnupg lsb-release 2>&1 | tail -3
+echo "[1/8] 安装基础工具..."
+if [ "$PKG_MGR" = "apt" ]; then
+  apt-get update -qq
+  apt-get install -y -qq curl wget git nginx certbot python3-certbot-nginx ca-certificates gnupg lsb-release 2>&1 | tail -3
+elif [ "$PKG_MGR" = "yum" ] || [ "$PKG_MGR" = "dnf" ]; then
+  $PKG_MGR install -y epel-release 2>&1 | tail -2
+  $PKG_MGR install -y curl wget git nginx certbot python3-certbot-nginx ca-certificates 2>&1 | tail -3
+fi
 
 # --- 2. 安装 Node.js 20 ---
 echo ""
@@ -58,11 +69,16 @@ echo "[2/8] 安装 Node.js ${NODE_VERSION}..."
 if command -v node &>/dev/null && [ "$(node -v | sed 's/v//' | cut -d. -f1)" = "$NODE_VERSION" ]; then
   echo "  Node.js ${NODE_VERSION} 已安装：$(node -v)"
 else
-  mkdir -p /etc/apt/keyrings
-  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_VERSION}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list
-  apt-get update -qq
-  apt-get install -y -qq nodejs 2>&1 | tail -3
+  if [ "$PKG_MGR" = "apt" ]; then
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_VERSION}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list
+    apt-get update -qq
+    apt-get install -y -qq nodejs 2>&1 | tail -3
+  else
+    curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION}.x | bash -
+    yum install -y nodejs 2>&1 | tail -3
+  fi
 fi
 
 echo "  Node: $(node -v)"
@@ -111,7 +127,6 @@ LLM_API_KEY=${LLM_API_KEY}
 LLM_MODEL=${LLM_MODEL}
 EOF
 
-# 飞书配置占位（不填不影响网页使用）
 if [ -n "${FEISHU_APP_ID:-}" ]; then
   echo "FEISHU_APP_ID=${FEISHU_APP_ID}" >> "$PROJECT_DIR/.env"
   echo "FEISHU_APP_SECRET=${FEISHU_APP_SECRET:-}" >> "$PROJECT_DIR/.env"
@@ -121,7 +136,6 @@ fi
 echo ""
 echo "[7/8] 配置 PM2 + Nginx..."
 
-# 生成 ecosystem.config.js
 cat > "$PROJECT_DIR/ecosystem.config.js" << 'PM2EOF'
 module.exports = {
   apps: [{
@@ -143,10 +157,8 @@ module.exports = {
 };
 PM2EOF
 
-# 创建 .data 目录
 mkdir -p "$PROJECT_DIR/.data"
 
-# 停掉旧进程，重新启动
 pm2 delete thinker-ai 2>/dev/null || true
 pm2 start "$PROJECT_DIR/ecosystem.config.js"
 pm2 save
@@ -157,19 +169,27 @@ echo "  PM2 已启动"
 echo ""
 echo "[8/8] 配置 Nginx..."
 
-# 取公网 IP 作为默认 server_name
 SERVER_IP=$(curl -s ifconfig.me || hostname -I | awk '{print $1}')
 SERVER_NAME="${DOMAIN:-$SERVER_IP}"
 
-cat > /etc/nginx/sites-available/thinker-ai << NGINXEOF
+# Ubuntu 用 sites-available，CentOS 用 conf.d
+if [ -d /etc/nginx/sites-available ]; then
+  NGINX_CONF="/etc/nginx/sites-available/thinker-ai"
+  NGINX_LINK="/etc/nginx/sites-enabled/thinker-ai"
+  NGINX_DISABLE="/etc/nginx/sites-enabled/default"
+else
+  NGINX_CONF="/etc/nginx/conf.d/thinker-ai.conf"
+  NGINX_LINK="$NGINX_CONF"
+  NGINX_DISABLE=""
+fi
+
+cat > "$NGINX_CONF" << NGINXEOF
 server {
     listen 80;
     server_name ${SERVER_NAME};
 
-    # 大文件上传
     client_max_body_size 100m;
 
-    # 反向代理到 Node.js
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
@@ -182,7 +202,6 @@ server {
         proxy_read_timeout 300s;
         proxy_send_timeout 300s;
 
-        # SSE 流式支持
         proxy_buffering off;
         proxy_cache off;
         add_header X-Accel-Buffering no;
@@ -190,10 +209,20 @@ server {
 }
 NGINXEOF
 
-ln -sf /etc/nginx/sites-available/thinker-ai /etc/nginx/sites-enabled/
-rm -f /etc/nginx/sites-enabled/default
+if [ "$NGINX_LINK" != "$NGINX_CONF" ]; then
+  ln -sf "$NGINX_CONF" "$NGINX_LINK"
+fi
+if [ -n "$NGINX_DISABLE" ] && [ -f "$NGINX_DISABLE" ]; then
+  rm -f "$NGINX_DISABLE"
+fi
 
-# 如果有域名，尝试配 SSL
+# 防火墙开 80/443
+if command -v firewall-cmd &>/dev/null; then
+  firewall-cmd --permanent --add-port=80/tcp 2>/dev/null || true
+  firewall-cmd --permanent --add-port=443/tcp 2>/dev/null || true
+  firewall-cmd --reload 2>/dev/null || true
+fi
+
 if [ -n "$DOMAIN" ]; then
   echo ""
   echo "  检测到域名 ${DOMAIN}，配置 SSL..."
