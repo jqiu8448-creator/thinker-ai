@@ -471,10 +471,12 @@ export function extractJson(text) {
 // SSE 解析通用逻辑（与后端 streamChat 配合）
 // /api/chat 始终返回 text/event-stream，前端读取并合并增量
 async function readSSEStream(resp, onToken) {
-  if (!resp.body || !resp.body.getReader) {
-    // 非流式响应兜底
+  const contentType = resp.headers && resp.headers.get ? resp.headers.get('content-type') || '' : '';
+  const isStream = /text\/event-stream/.test(contentType);
+
+  if (!isStream || !resp.body || !resp.body.getReader) {
     const text = await resp.text();
-    if (onToken) onToken(text);
+    if (onToken && text) onToken(text);
     return text;
   }
   const reader = resp.body.getReader();

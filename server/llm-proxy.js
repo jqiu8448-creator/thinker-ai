@@ -61,12 +61,30 @@ async function streamChat({ messages, temperature = 0.7, topP = 0.9, maxTokens }
     throw new Error(`LLM HTTP ${resp.status}: ${detail}`);
   }
 
-  // 流式头
+  const contentType = resp.headers.get('content-type') || '';
+  const isStream = /text\/event-stream/.test(contentType);
+
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
-  // 禁用反向代理缓冲，保证流式输出
   res.setHeader('X-Accel-Buffering', 'no');
+
+  if (!isStream) {
+    clearTimeout(timeoutId);
+    const text = await resp.text();
+    try {
+      const json = JSON.parse(text);
+      const content = json?.choices?.[0]?.message?.content || '';
+      const chunk = `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`;
+      res.write(chunk);
+      res.write(`data: [DONE]\n\n`);
+      res.end();
+    } catch (e) {
+      res.write(`data: [ERROR] LLM 返回格式异常: ${text.slice(0, 200)}\n\n`);
+      res.end();
+    }
+    return;
+  }
 
   const reader = resp.body.getReader();
   const decoder = new TextDecoder('utf-8');
