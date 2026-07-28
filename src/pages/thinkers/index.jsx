@@ -96,31 +96,27 @@ export default function Thinkers() {
   const shareCard = () => {
     const d = detail;
     if (!d || !d.name) return;
-    // H5 端：复制文本摘要到剪贴板
-    if (Taro.getEnv() !== Taro.ENV_TYPE.WEAPP) {
-      ensureWatermark().then((wm) => {
-        const lines = [
-          d.name,
-          d.tagline ? `「${d.tagline}」` : '',
-          d.quote ? `${d.quote}${d.quoteSrc ? ' —— ' + d.quoteSrc : ''}` : '',
-          d.facts && d.facts.era ? `时代：${d.facts.era}` : '',
-          d.facts && d.facts.identity ? `身份：${d.facts.identity}` : '',
-          d.works && d.works.length ? `著述：${d.works.slice(0, 3).map((w) => '《' + w + '》').join('、')}` : '',
-          wm ? `分享自 · ${wm}` : '',
-          '— 思想家AI',
-        ].filter(Boolean).join('\n');
-        Taro.setClipboardData({
-          data: lines,
-          success: () => Taro.showToast({ title: '档案已复制到剪贴板', icon: 'none' }),
-        });
-      });
-      return;
-    }
     Taro.showLoading({ title: '生成卡片…', mask: true });
     ensureWatermark().then((wm) => renderCard(d, wm || ''));
   };
 
   const renderCard = (d, wm) => {
+    // H5 端直接用 DOM 获取 canvas
+    if (typeof document !== 'undefined') {
+      const canvas = document.getElementById('shareCanvas');
+      if (!canvas || canvas.tagName.toLowerCase() !== 'canvas') {
+        // Taro H5 可能用自定义元素
+        const el = document.querySelector('#shareCanvas canvas') || document.querySelector('#shareCanvas');
+        if (el && el.getContext) {
+          drawOnCanvas(el, d, wm);
+          return;
+        }
+      } else if (canvas.getContext) {
+        drawOnCanvas(canvas, d, wm);
+        return;
+      }
+    }
+    // 小程序端用 createSelectorQuery
     Taro.createSelectorQuery()
       .select('#shareCanvas')
       .fields({ node: true, size: true })
@@ -130,35 +126,56 @@ export default function Thinkers() {
           Taro.showToast({ title: '画布初始化失败', icon: 'none' });
           return;
         }
-        const canvas = res[0].node;
-        const ctx = canvas.getContext('2d');
-        const dpr = (Taro.getWindowInfo && Taro.getWindowInfo().pixelRatio) || 2;
-        const W = 600;
-        const H = drawCard(ctx, W, d, wm, true);
-        canvas.width = W * dpr;
-        canvas.height = H * dpr;
-        ctx.scale(dpr, dpr);
-        drawCard(ctx, W, d, wm, false, H);
-        Taro.canvasToTempFilePath({
-          canvas,
-          success: (r) => {
-            Taro.hideLoading();
-            const path = r.tempFilePath;
-            if (typeof Taro.showShareImageMenu === 'function') {
-              Taro.showShareImageMenu({
-                path,
-                fail: () => Taro.previewImage({ urls: [path] }),
-              });
-            } else {
-              Taro.previewImage({ urls: [path] });
-            }
-          },
-          fail: () => {
-            Taro.hideLoading();
-            Taro.showToast({ title: '生成失败', icon: 'none' });
-          },
-        });
+        drawOnCanvas(res[0].node, d, wm);
       });
+  };
+
+  const drawOnCanvas = (canvas, d, wm) => {
+    const ctx = canvas.getContext('2d');
+    const dpr = (typeof Taro.getWindowInfo === 'function' && Taro.getWindowInfo().pixelRatio) || 2;
+    const W = 600;
+    const H = drawCard(ctx, W, d, wm, true);
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    drawCard(ctx, W, d, wm, false, H);
+
+    // H5 端：转 dataURL 下载
+    if (typeof document !== 'undefined') {
+      Taro.hideLoading();
+      try {
+        const dataURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `${d.name}_思想家档案.png`;
+        link.href = dataURL;
+        link.click();
+        Taro.showToast({ title: '卡片已保存', icon: 'success' });
+      } catch (e) {
+        Taro.showToast({ title: '保存失败', icon: 'none' });
+      }
+      return;
+    }
+
+    // 小程序端
+    Taro.canvasToTempFilePath({
+      canvas,
+      success: (r) => {
+        Taro.hideLoading();
+        const path = r.tempFilePath;
+        if (typeof Taro.showShareImageMenu === 'function') {
+          Taro.showShareImageMenu({
+            path,
+            fail: () => Taro.previewImage({ urls: [path] }),
+          });
+        } else {
+          Taro.previewImage({ urls: [path] });
+        }
+      },
+      fail: () => {
+        Taro.hideLoading();
+        Taro.showToast({ title: '生成失败', icon: 'none' });
+      },
+    });
   };
 
   // measure=true：仅返回画布高度；measure=false：在高度 H 的画布上绘制

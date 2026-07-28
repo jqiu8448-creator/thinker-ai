@@ -228,6 +228,51 @@
     color: var(--text-faint);
     font-family: var(--font-sans);
   }
+
+  .history-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12rpx;
+    flex: none;
+    margin-left: 8rpx;
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease-out);
+  }
+
+  .history-item:hover .history-actions,
+  .history-item.active .history-actions {
+    opacity: 1;
+  }
+
+  .history-act-btn {
+    width: 48rpx;
+    height: 48rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24rpx;
+    color: var(--text-muted);
+    background: var(--paper-deep);
+    border: 1px solid var(--line);
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+
+  .history-act-btn:active {
+    transform: scale(0.9);
+  }
+
+  .fav-btn {
+    color: var(--seal);
+  }
+
+  .share-btn {
+    color: var(--text-soft);
+  }
+
+  .share-icon {
+    font-size: 22rpx;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -529,7 +574,7 @@ taro-text-core.content,
   font-size: 32rpx;
   line-height: 1.9;
   color: var(--ink);
-  text-align: center !important;
+  text-align: left !important;
 }
 
 /* --- 思想家消息：信笺 + 头像 + 落款 --- */
@@ -579,7 +624,7 @@ taro-text-core.content,
   box-shadow: var(--shadow-card);
   max-width: 100%;
   position: relative;
-  text-align: center !important;
+  text-align: left !important;
 }
 
 /* 信笺角装饰 */
@@ -1249,6 +1294,29 @@ taro-textarea-core.input-field textarea::placeholder {
   .bubble .content {
     font-size: 28rpx;
   }
+}
+
+/* 让整个输入区域可点击 */
+.input-box {
+  cursor: text;
+}
+.input-field,
+taro-textarea-core.input-field {
+  display: block;
+  width: 100% !important;
+  min-height: 120rpx;
+  cursor: text;
+}
+taro-textarea-core.input-field {
+  display: flex;
+  align-items: stretch;
+}
+taro-textarea-core.input-field > textarea,
+taro-textarea-core.input-field .taro-textarea {
+  flex: 1;
+  width: 100% !important;
+  min-height: 120rpx;
+  cursor: text;
 }
 
 /* ===== 对话字号档位 ===== */

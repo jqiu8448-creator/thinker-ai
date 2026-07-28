@@ -37,7 +37,7 @@
 
 .d-card {
   width: 100%;
-  max-width: 960rpx;
+  max-width: 1200rpx;
   max-height: 88vh;
   background: var(--paper-card);
   border-radius: var(--radius-xl);
@@ -382,10 +382,10 @@
     padding: 24rpx 0 0;
   }
   .d-mask {
-    padding: 80rpx var(--margin);
+    padding: 40rpx var(--margin);
   }
   .d-card {
-    max-width: 1080rpx;
+    max-width: 2000rpx;
     max-height: 86vh;
     margin: 0 auto;
   }

@@ -679,3 +679,16 @@
     font-size: 24rpx;
   }
 }
+
+/* ===== 弹窗内样式 ===== */
+.setting-popup-body {
+  padding: 32rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
+}
+.popup-stepper {
+  justify-content: center;
+  margin: 20rpx 0;
+}
+.ai-popup-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}

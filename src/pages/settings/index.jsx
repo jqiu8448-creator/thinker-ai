@@ -53,6 +53,8 @@ export default function Settings() {
   const [showWatermark, setShowWatermark] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showAi, setShowAi] = useState(false);
+  const [showRetention, setShowRetention] = useState(false);
+  const [showFontScale, setShowFontScale] = useState(false);
   const [wmInput, setWmInput] = useState('');
 
   // 初次加载
@@ -309,10 +311,25 @@ export default function Settings() {
       <View className="hint kai">设置 · 对话之余</View>
 
       {/* 保留数量 */}
-      <View className="setting-card">
+      <View className="setting-card" onClick={() => setShowRetention(true)}>
         <View className="setting-row">
           <Text className="setting-label">保留会话数量</Text>
-          <View className="stepper">
+          <View className="setting-value">
+            <Text className="sv-text">{retention}</Text>
+            <Text className="sv-arrow">›</Text>
+          </View>
+        </View>
+      </View>
+
+      <Popup show={showRetention} position="bottom" onClose={() => setShowRetention(false)}>
+        <View className="ed-bar">
+          <Text className="ed-title kai">保留会话数量</Text>
+          <Text className="ed-close" onClick={() => setShowRetention(false)}>
+            ✕
+          </Text>
+        </View>
+        <View className="setting-popup-body">
+          <View className="stepper popup-stepper">
             <View className="step-btn" onClick={() => changeRetention(retention - 1)}>
               －
             </View>
@@ -321,32 +338,46 @@ export default function Settings() {
               ＋
             </View>
           </View>
+          <View className="setting-tip">超出后自动删除最旧的会话（不可恢复）</View>
         </View>
-        <View className="setting-tip">超出后自动删除最旧的会话（不可恢复）</View>
-      </View>
+      </Popup>
 
       {/* 对话字号 */}
-      <View className="setting-card">
+      <View className="setting-card" onClick={() => setShowFontScale(true)}>
         <View className="setting-row">
           <Text className="setting-label">对话字号</Text>
-          <Text className="sv-text">
-            {FONT_SCALES.find((s) => s.key === fontScale)?.label || '默认'}
+          <View className="setting-value">
+            <Text className="sv-text">
+              {FONT_SCALES.find((s) => s.key === fontScale)?.label || '默认'}
+            </Text>
+            <Text className="sv-arrow">›</Text>
+          </View>
+        </View>
+      </View>
+
+      <Popup show={showFontScale} position="bottom" onClose={() => setShowFontScale(false)}>
+        <View className="ed-bar">
+          <Text className="ed-title kai">对话字号</Text>
+          <Text className="ed-close" onClick={() => setShowFontScale(false)}>
+            ✕
           </Text>
         </View>
-        <View className="font-scale-grid">
-          {FONT_SCALES.map((s) => (
-            <View
-              key={s.key}
-              className={`font-scale-btn ${fontScale === s.key ? 'on' : ''}`}
-              onClick={() => changeFontScale(s.key)}
-            >
-              <Text className="fs-name">{s.label}</Text>
-              <Text className={`fs-sample fs-sample-${s.key}`}>永</Text>
-            </View>
-          ))}
+        <View className="setting-popup-body">
+          <View className="font-scale-grid">
+            {FONT_SCALES.map((s) => (
+              <View
+                key={s.key}
+                className={`font-scale-btn ${fontScale === s.key ? 'on' : ''}`}
+                onClick={() => changeFontScale(s.key)}
+              >
+                <Text className="fs-name">{s.label}</Text>
+                <Text className={`fs-sample fs-sample-${s.key}`}>永</Text>
+              </View>
+            ))}
+          </View>
+          <View className="setting-tip">仅作用于对话气泡，自动排版不超出窗口</View>
         </View>
-        <View className="setting-tip">仅作用于对话气泡，自动排版不超出窗口</View>
-      </View>
+      </Popup>
 
       {/* AI 接口 — 托管模式 / 自定义模式 */}
       {isHosted() ? (
@@ -374,148 +405,67 @@ export default function Settings() {
         </View>
       ) : (
         <View className="setting-card ai-card">
-          <View className="setting-row" onClick={() => setShowAi(!showAi)}>
+          <View className="setting-row" onClick={() => setShowAi(true)}>
             <Text className="setting-label">AI 接口</Text>
             <View className="setting-value">
               <Text className="sv-text">{aiProvider === 'custom' ? '自定义 API' : '云开发'}</Text>
-              <Text className="sv-arrow">{showAi ? '⌃' : '›'}</Text>
+              <Text className="sv-arrow">›</Text>
             </View>
           </View>
           <View className="setting-tip">使用你自己的 OpenAI 兼容接口（保存在本机浏览器）</View>
-
-          {showAi && (
-            <View className="ai-inline">
-              <View className="ai-tip">所有对话将走你填写的接口（保存在本机浏览器，不会上传任何服务器）。</View>
-              <View className="ed-label">Base URL（含 /v1）</View>
-              <Input
-                className="ed-input"
-                placeholder="https://api.deepseek.com/v1"
-                placeholderClass="ed-ph"
-                value={customBaseUrl}
-                onInput={(e) => setCustomBaseUrl(e.detail.value)}
-              />
-              <View className="ed-label">API Key</View>
-              <Input
-                className="ed-input"
-                placeholder="sk-..."
-                placeholderClass="ed-ph"
-                value={customApiKey}
-                onInput={(e) => setCustomApiKey(e.detail.value)}
-              />
-              <View className="ed-label">模型名</View>
-              <Input
-                className="ed-input"
-                placeholder="deepseek-chat"
-                placeholderClass="ed-ph"
-                value={customModel}
-                onInput={(e) => setCustomModel(e.detail.value)}
-              />
-              <View className="ai-test">
-                <Button
-                  className="ai-test-btn"
-                  loading={aiBusy && !stressProgress}
-                  disabled={aiBusy}
-                  onClick={testAi}
-                >
-                  测试连接
-                </Button>
-                {aiTestResult && <Text className="ai-test-result">{aiTestResult}</Text>}
-              </View>
-
-              {/* 压力测试 */}
-              <View className="stress-test-section">
-                <View className="stress-test-label">
-                  <Text className="st-label-text">对席模式实测</Text>
-                  <Text className="st-label-desc">
-                    模拟最长模式（对席，maxTokens=6000）的完整回复，看实际消耗多少 token
-                  </Text>
-                </View>
-                {!stressProgress && !stressResult && (
-                  <Button
-                    className="stress-test-btn"
-                    disabled={aiBusy}
-                    onClick={startStressTest}
-                  >
-                    开始测试
-                  </Button>
-                )}
-                {stressProgress && (
-                  <View className="stress-progress">
-                    <View className="sp-stats">
-                      <View className="sp-stat">
-                        <Text className="sp-num">{stressProgress.tokens}</Text>
-                        <Text className="sp-unit">tokens</Text>
-                      </View>
-                      <View className="sp-stat">
-                        <Text className="sp-num">{(stressProgress.timeMs / 1000).toFixed(1)}</Text>
-                        <Text className="sp-unit">秒</Text>
-                      </View>
-                      <View className="sp-stat">
-                        <Text className="sp-num">
-                          {stressProgress.firstTokenMs > 0 ? `${stressProgress.firstTokenMs}` : '—'}
-                        </Text>
-                        <Text className="sp-unit">首字延迟ms</Text>
-                      </View>
-                    </View>
-                    <View className="sp-text-preview">
-                      {stressProgress.text.slice(-120)}
-                      <Text className="sp-cursor">▌</Text>
-                    </View>
-                    <Button className="stress-cancel-btn" onClick={cancelStressTest}>
-                      取消测试
-                    </Button>
-                  </View>
-                )}
-                {stressResult && (
-                  <View className="stress-result">
-                    <View className="sr-header">
-                      <Text className={`sr-status ${stressResult.complete ? 'ok' : 'warn'}`}>
-                        {stressResult.complete ? '✓ 完整输出' : '⚠ 提前截断'}
-                      </Text>
-                      <Text className="sr-mode-tag">{stressResult.mode}</Text>
-                    </View>
-                    <View className="sr-stats">
-                      <View className="sr-stat">
-                        <Text className="sr-label">实际输出</Text>
-                        <Text className="sr-value">{stressResult.tokens} tok</Text>
-                      </View>
-                      <View className="sr-stat">
-                        <Text className="sr-label">模式上限</Text>
-                        <Text className="sr-value">{stressResult.maxTokens} tok</Text>
-                      </View>
-                      <View className="sr-stat">
-                        <Text className="sr-label">总耗时</Text>
-                        <Text className="sr-value">{(stressResult.timeMs / 1000).toFixed(1)} 秒</Text>
-                      </View>
-                      <View className="sr-stat">
-                        <Text className="sr-label">首字延迟</Text>
-                        <Text className="sr-value">{stressResult.firstTokenMs} ms</Text>
-                      </View>
-                      <View className="sr-stat">
-                        <Text className="sr-label">生成速度</Text>
-                        <Text className="sr-value">
-                          {Math.round(stressResult.tokens / (stressResult.timeMs / 1000))} tok/s
-                        </Text>
-                      </View>
-                      <View className="sr-stat">
-                        <Text className="sr-label">字数</Text>
-                        <Text className="sr-value">{stressResult.text.length} 字</Text>
-                      </View>
-                    </View>
-                    <View className="sr-preview">
-                      <Text className="sr-preview-label">回复预览（前150字）：</Text>
-                      <Text className="sr-preview-text">{stressResult.text.slice(0, 150)}…</Text>
-                    </View>
-                  </View>
-                )}
-              </View>
-
-              <Button className="d-btn ai-save-btn" loading={aiBusy} onClick={saveAi}>
-                保存
-              </Button>
-            </View>
-          )}
         </View>
+      )}
+
+      {!isHosted() && (
+        <Popup show={showAi} position="bottom" onClose={() => setShowAi(false)}>
+          <View className="ed-bar">
+            <Text className="ed-title kai">AI 接口配置</Text>
+            <Text className="ed-close" onClick={() => setShowAi(false)}>
+              ✕
+            </Text>
+          </View>
+          <View className="setting-popup-body ai-popup-body">
+            <View className="ai-tip">所有对话将走你填写的接口（保存在本机浏览器，不会上传任何服务器）。</View>
+            <View className="ed-label">Base URL（含 /v1）</View>
+            <Input
+              className="ed-input"
+              placeholder="https://api.deepseek.com/v1"
+              placeholderClass="ed-ph"
+              value={customBaseUrl}
+              onInput={(e) => setCustomBaseUrl(e.detail.value)}
+            />
+            <View className="ed-label">API Key</View>
+            <Input
+              className="ed-input"
+              placeholder="sk-..."
+              placeholderClass="ed-ph"
+              value={customApiKey}
+              onInput={(e) => setCustomApiKey(e.detail.value)}
+            />
+            <View className="ed-label">模型名</View>
+            <Input
+              className="ed-input"
+              placeholder="deepseek-chat"
+              placeholderClass="ed-ph"
+              value={customModel}
+              onInput={(e) => setCustomModel(e.detail.value)}
+            />
+            <View className="ai-test">
+              <Button
+                className="ai-test-btn"
+                loading={aiBusy && !stressProgress}
+                disabled={aiBusy}
+                onClick={testAi}
+              >
+                测试连接
+              </Button>
+              {aiTestResult && <Text className="ai-test-result">{aiTestResult}</Text>}
+            </View>
+            <Button className="d-btn ai-save-btn" loading={aiBusy} onClick={saveAi}>
+              保存
+            </Button>
+          </View>
+        </Popup>
       )}
 
       {/* 常用功能 */}

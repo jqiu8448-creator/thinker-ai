@@ -697,6 +697,27 @@ export default function Huiyin() {
     });
   };
 
+  const toggleHistoryFav = (sid) => {
+    const list = historyList.map((h) =>
+      h.sessionId === sid ? { ...h, favorite: !h.favorite } : h
+    );
+    setHistoryList(list);
+    saveHistoryList(list);
+  };
+
+  const shareHistorySession = (h) => {
+    const lines = [
+      `${h.thinker || '思想家'} · ${modeName(h.mode)}`,
+      h.topic ? `话题：${h.topic}` : '',
+      h.preview || '',
+      '— 思想家AI',
+    ].filter(Boolean).join('\n');
+    Taro.setClipboardData({
+      data: lines,
+      success: () => Taro.showToast({ title: '已复制对话摘要', icon: 'none' }),
+    });
+  };
+
   const startNewChat = () => {
     clearGlobalState();
     setMessages([]);
@@ -751,6 +772,26 @@ export default function Huiyin() {
                   </View>
                   <View className="history-preview">{h.preview || h.topic || '无主题'}</View>
                   <View className="history-time">{fmtTime(h.updatedAt)}</View>
+                </View>
+                <View className="history-actions" onClick={(e) => e.stopPropagation()}>
+                  <View
+                    className="history-act-btn fav-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleHistoryFav(h.sessionId);
+                    }}
+                  >
+                    {h.favorite ? '★' : '☆'}
+                  </View>
+                  <View
+                    className="history-act-btn share-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      shareHistorySession(h);
+                    }}
+                  >
+                    <Text className="share-icon">⇗</Text>
+                  </View>
                 </View>
               </View>
             ))
