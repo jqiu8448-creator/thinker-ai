@@ -5,6 +5,7 @@ import { ensureApiConfig, hasApiConfig } from '@/utils/api-config';
 import { callCloud } from '@/utils/cloud';
 import { getGlobal } from '@/utils/global';
 import Tabbar from '@/components/tabbar';
+import Splash from '@/components/splash';
 import thinkersData from '@/data/thinkers.json';
 import './index.scss';
 
@@ -96,6 +97,7 @@ function matchCategories(topic) {
 }
 
 export default function Home() {
+  const [showSplash, setShowSplash] = useState(true);
   const [topic, setTopic] = useState('');
   const [continueSession, setContinueSession] = useState('');
   const [quoteIdx, setQuoteIdx] = useState(0);
@@ -356,6 +358,7 @@ export default function Home() {
 
   return (
     <View className="page">
+      {showSplash && <Splash onEnter={() => setShowSplash(false)} />}
       <Tabbar current="home" />
 
       {/* 标题 */}

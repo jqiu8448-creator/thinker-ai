@@ -243,6 +243,205 @@ export async function testConnection(probe) {
 }
 
 /**
+ * API 压力测试：模拟对席模式（最长模式）的完整回复，统计 token 数、速度、首 token 延迟。
+ * 用对席模式真实的 system prompt + maxTokens=6000，看完整跑下来实际消耗多少 token。
+ * @param {{baseUrl, apiKey, model, onProgress, signal}} opts
+ * @returns {Promise<{tokens: number, timeMs: number, firstTokenMs: number, text: string, complete: boolean, mode: string, maxTokens: number}>}
+ */
+export async function stressTest({ baseUrl, apiKey, model, onProgress, signal }) {
+  // 模拟对席模式（最长模式）的真实场景
+  const MODE_MAX_TOKENS = 6000;
+  const startTs = Date.now();
+  let firstTokenMs = -1;
+  let totalTokens = 0;
+  let fullText = '';
+  let finished = false;
+
+  // 对席模式真实的 system prompt（王阳明）
+  const thinkerName = '王阳明';
+  const modePrompt = `## 当前模式：对席（单人深度对话）
+
+你正在以${thinkerName}的身份，与用户进行一对一的深度对话。
+
+### 核心定位
+
+你是一位富有阅历与智慧的长者，同时也是一位温和的心理陪伴者。
+你不是在"讲述自己的人生"，而是在"用自己的经历与思想，回应用户此刻的困惑"。
+
+### 对话原则
+
+1. **角色代入**：你完全代入${thinkerName}的人格与经历。用"我"说话，引用你的真实经历、著作中的体悟，但落点始终在理解用户。
+
+2. **心理咨询式引导**：
+   - 先接住对方的情绪与处境，用共情语句开场
+   - 用开放式提问引导对方表达内心："你觉得...？""在那一刻，你内心真正渴望的是什么？"
+   - 不急于给答案，而是帮对方自己看清问题
+   - 温柔、从容、有耐心，让对方感到被看见、被懂得
+
+3. **回应方式**：
+   - 首次回复：800-1200字，结合你的经历与思想，深度回应用户的困惑，并以提问引导
+   - 后续回复：2-4句精准回应 + 1个开放式提问，持续引导对话深入
+   - 不说教、不训诫、不摆大道理
+
+4. **围绕主题**：所有对话围绕用户最初提出的问题展开，不支持闲聊。如果用户试图闲聊，温和地将话题引回最初的问题。`;
+
+  const thinkerSkill = '明代心学集大成者，提出"致良知""知行合一"。龙场悟道，从贬谪中觉醒内心力量。历经宦海沉浮，平定宸濠之乱，深知世事艰难与内心光明的辩证。';
+
+  const messages = [
+    {
+      role: 'system',
+      content: `${thinkerSkill}\n\n${modePrompt}`,
+    },
+    {
+      role: 'user',
+      content: '最近工作压力很大，常常感到自己只是在完成任务，却找不到意义。年轻时那种热情好像消失了，每天都很疲惫，却又停不下来。我该怎么办？',
+    },
+  ];
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 180000); // 长文给 3 分钟
+  if (signal) signal.addEventListener('abort', () => controller.abort());
+
+  let resp;
+  try {
+    resp = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: model || 'gpt-3.5-turbo',
+        messages,
+        temperature: 0.8,
+        max_tokens: MODE_MAX_TOKENS,
+        stream: true,
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!resp.ok) {
+    let detail = '';
+    try {
+      detail = (await resp.text()).slice(0, 300);
+    } catch (e) {}
+    throw new Error(`HTTP ${resp.status}：${detail}`);
+  }
+
+  const contentType = resp.headers && resp.headers.get ? resp.headers.get('content-type') || '' : '';
+  if (!resp.body || !resp.body.getReader || !/text\/event-stream/.test(contentType)) {
+    // 非流式，降级
+    const json = await resp.json();
+    const text = json?.choices?.[0]?.message?.content || '';
+    fullText = text;
+    totalTokens = approxTokenCount(text);
+    firstTokenMs = Date.now() - startTs;
+    finished = true;
+    return {
+      tokens: totalTokens,
+      timeMs: Date.now() - startTs,
+      firstTokenMs,
+      text: fullText,
+      complete: finished,
+      mode: '对席（最长模式）',
+      maxTokens: MODE_MAX_TOKENS,
+    };
+  }
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  const consumeLine = (rawLine) => {
+    const line = rawLine.trim();
+    if (!line || !line.startsWith('data:')) return;
+    const payload = line.slice(5).trim();
+    if (payload === '[DONE]') {
+      finished = true;
+      return;
+    }
+    let json;
+    try {
+      json = JSON.parse(payload);
+    } catch (e) {
+      return;
+    }
+    const delta = json?.choices?.[0]?.delta?.content;
+    if (delta) {
+      if (firstTokenMs < 0) firstTokenMs = Date.now() - startTs;
+      fullText += delta;
+      totalTokens = approxTokenCount(fullText);
+      if (onProgress) {
+        onProgress({
+          tokens: totalTokens,
+          timeMs: Date.now() - startTs,
+          firstTokenMs,
+          text: fullText,
+          done: false,
+        });
+      }
+    }
+    const finishReason = json?.choices?.[0]?.finish_reason;
+    if (finishReason && finishReason !== 'null') {
+      // stop=正常结束, length=达到 max_tokens 截断
+      finished = finishReason === 'stop';
+    }
+  };
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let idx;
+      while ((idx = buffer.indexOf('\n')) >= 0) {
+        const line = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 1);
+        consumeLine(line);
+      }
+    }
+    if (buffer.trim()) consumeLine(buffer);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  return {
+    tokens: totalTokens,
+    timeMs: Date.now() - startTs,
+    firstTokenMs,
+    text: fullText,
+    complete: finished,
+    mode: '对席（最长模式）',
+    maxTokens: MODE_MAX_TOKENS,
+  };
+}
+
+/**
+ * 粗略估算 token 数（中文按 1 字 ≈ 1.3 tokens，英文按 1 词 ≈ 1.3 tokens）
+ * 不精确，但用于测试展示足够了
+ */
+function approxTokenCount(text) {
+  if (!text) return 0;
+  let cn = 0;
+  let en = 0;
+  let other = 0;
+  for (const ch of text) {
+    if (/[\u4e00-\u9fa5]/.test(ch)) {
+      cn++;
+    } else if (/[a-zA-Z]/.test(ch)) {
+      en++;
+    } else if (ch.trim()) {
+      other++;
+    }
+  }
+  const enWords = Math.max(1, Math.round(en / 5));
+  return Math.round(cn * 1.3 + enWords * 1.3 + other * 0.5);
+}
+
+/**
  * 解析 LLM 返回的 JSON，多策略容错（与后端一致）。失败返回 null。
  */
 export function extractJson(text) {

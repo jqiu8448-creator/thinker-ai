@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, Input, Button, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { callCloud } from '@/utils/cloud';
 import { getGlobal, ensureWatermark, FONT_SCALES, getFontScale, setFontScale, applyFontScaleToDom } from '@/utils/global';
 import { ensureApiConfig } from '@/utils/api-config';
+import { stressTest } from '@/utils/llm';
 import { modeName } from '@/utils/modes';
 import { isHosted, getHostedConfig, hostedHeaders } from '@/utils/hosted';
 import Popup from '@/components/popup';
@@ -39,6 +40,9 @@ export default function Settings() {
   const [customModel, setCustomModel] = useState('');
   const [aiBusy, setAiBusy] = useState(false);
   const [aiTestResult, setAiTestResult] = useState('');
+  const [stressResult, setStressResult] = useState(null);
+  const [stressProgress, setStressProgress] = useState(null);
+  const stressAbortRef = useRef(null);
 
   // 托管模式：剩余配额
   const [quotaRemaining, setQuotaRemaining] = useState(-1);
@@ -246,6 +250,54 @@ export default function Settings() {
     }
   };
 
+  const startStressTest = async () => {
+    if (aiProvider !== 'custom') {
+      Taro.showToast({ title: '请先开启「使用自定义 API」', icon: 'none' });
+      return;
+    }
+    if (!customBaseUrl || !customApiKey) {
+      Taro.showToast({ title: '请先填写 Base URL 与 API Key', icon: 'none' });
+      return;
+    }
+    if (aiBusy) return;
+
+    setAiBusy(true);
+    setStressResult(null);
+    setStressProgress({ tokens: 0, timeMs: 0, firstTokenMs: -1, text: '', done: false });
+
+    const controller = new AbortController();
+    stressAbortRef.current = controller;
+
+    try {
+      const result = await stressTest({
+        baseUrl: customBaseUrl,
+        apiKey: customApiKey,
+        model: customModel || undefined,
+        maxTokens: 2000,
+        signal: controller.signal,
+        onProgress: (p) => setStressProgress(p),
+      });
+      setStressResult(result);
+      setStressProgress(null);
+    } catch (e) {
+      if (e.name === 'AbortError') {
+        setAiTestResult('测试已取消');
+      } else {
+        setAiTestResult('✗ ' + (e.message || '测试失败'));
+      }
+      setStressProgress(null);
+    } finally {
+      setAiBusy(false);
+      stressAbortRef.current = null;
+    }
+  };
+
+  const cancelStressTest = () => {
+    if (stressAbortRef.current) {
+      stressAbortRef.current.abort();
+    }
+  };
+
   const openSession = (id) => {
     if (!id) return;
     Taro.navigateTo({ url: `/pages/huiyin/index?sessionId=${encodeURIComponent(id)}` });
@@ -361,7 +413,7 @@ export default function Settings() {
               <View className="ai-test">
                 <Button
                   className="ai-test-btn"
-                  loading={aiBusy}
+                  loading={aiBusy && !stressProgress}
                   disabled={aiBusy}
                   onClick={testAi}
                 >
@@ -369,6 +421,95 @@ export default function Settings() {
                 </Button>
                 {aiTestResult && <Text className="ai-test-result">{aiTestResult}</Text>}
               </View>
+
+              {/* 压力测试 */}
+              <View className="stress-test-section">
+                <View className="stress-test-label">
+                  <Text className="st-label-text">对席模式实测</Text>
+                  <Text className="st-label-desc">
+                    模拟最长模式（对席，maxTokens=6000）的完整回复，看实际消耗多少 token
+                  </Text>
+                </View>
+                {!stressProgress && !stressResult && (
+                  <Button
+                    className="stress-test-btn"
+                    disabled={aiBusy}
+                    onClick={startStressTest}
+                  >
+                    开始测试
+                  </Button>
+                )}
+                {stressProgress && (
+                  <View className="stress-progress">
+                    <View className="sp-stats">
+                      <View className="sp-stat">
+                        <Text className="sp-num">{stressProgress.tokens}</Text>
+                        <Text className="sp-unit">tokens</Text>
+                      </View>
+                      <View className="sp-stat">
+                        <Text className="sp-num">{(stressProgress.timeMs / 1000).toFixed(1)}</Text>
+                        <Text className="sp-unit">秒</Text>
+                      </View>
+                      <View className="sp-stat">
+                        <Text className="sp-num">
+                          {stressProgress.firstTokenMs > 0 ? `${stressProgress.firstTokenMs}` : '—'}
+                        </Text>
+                        <Text className="sp-unit">首字延迟ms</Text>
+                      </View>
+                    </View>
+                    <View className="sp-text-preview">
+                      {stressProgress.text.slice(-120)}
+                      <Text className="sp-cursor">▌</Text>
+                    </View>
+                    <Button className="stress-cancel-btn" onClick={cancelStressTest}>
+                      取消测试
+                    </Button>
+                  </View>
+                )}
+                {stressResult && (
+                  <View className="stress-result">
+                    <View className="sr-header">
+                      <Text className={`sr-status ${stressResult.complete ? 'ok' : 'warn'}`}>
+                        {stressResult.complete ? '✓ 完整输出' : '⚠ 提前截断'}
+                      </Text>
+                      <Text className="sr-mode-tag">{stressResult.mode}</Text>
+                    </View>
+                    <View className="sr-stats">
+                      <View className="sr-stat">
+                        <Text className="sr-label">实际输出</Text>
+                        <Text className="sr-value">{stressResult.tokens} tok</Text>
+                      </View>
+                      <View className="sr-stat">
+                        <Text className="sr-label">模式上限</Text>
+                        <Text className="sr-value">{stressResult.maxTokens} tok</Text>
+                      </View>
+                      <View className="sr-stat">
+                        <Text className="sr-label">总耗时</Text>
+                        <Text className="sr-value">{(stressResult.timeMs / 1000).toFixed(1)} 秒</Text>
+                      </View>
+                      <View className="sr-stat">
+                        <Text className="sr-label">首字延迟</Text>
+                        <Text className="sr-value">{stressResult.firstTokenMs} ms</Text>
+                      </View>
+                      <View className="sr-stat">
+                        <Text className="sr-label">生成速度</Text>
+                        <Text className="sr-value">
+                          {Math.round(stressResult.tokens / (stressResult.timeMs / 1000))} tok/s
+                        </Text>
+                      </View>
+                      <View className="sr-stat">
+                        <Text className="sr-label">字数</Text>
+                        <Text className="sr-value">{stressResult.text.length} 字</Text>
+                      </View>
+                    </View>
+                    <View className="sr-preview">
+                      <Text className="sr-preview-label">回复预览（前150字）：</Text>
+                      <Text className="sr-preview-text">{stressResult.text.slice(0, 150)}…</Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+
               <Button className="d-btn ai-save-btn" loading={aiBusy} onClick={saveAi}>
                 保存
               </Button>
