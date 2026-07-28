@@ -1,0 +1,15 @@
+{
+  "miniprogramRoot": "./dist/",
+  "projectname": "taro-app",
+  "description": "思想家AI 跨端",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}

@@ -1,0 +1,70 @@
+// 全局基础样式 — 墨禅 Sumi
+@import './styles/theme.scss';
+
+page,
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  color-scheme: light;
+  font-family: var(--font-body);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 56px,
+      rgba(0,0,0,0.008) 56px,
+      rgba(0,0,0,0.008) 58px
+    );
+  background-attachment: fixed;
+}
+
+/* 桌面端全屏沉浸 */
+@media (min-width: 768px) {
+  html {
+    background-color: var(--bg);
+    font-size: 22PX !important;
+    
+  }
+  body {
+    background-color: var(--bg);
+  }
+  #app {
+    position: relative;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 56px,
+        rgba(0,0,0,0.008) 56px,
+        rgba(0,0,0,0.008) 58px
+      );
+    overflow-x: hidden;
+  }
+  #app > * {
+    background-color: var(--bg);
+  }
+  /* 修复 Taro 默认 transform: translate(100%,0) 导致首次加载页面被推到屏幕外 */
+  .taro_router > .taro_page {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+textarea,
+input {
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  &:focus {
+    outline: none;
+  }
+}

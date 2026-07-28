@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>思想家AI</title>
+    <style>
+      /* 关键 CSS 变量 — 防止首次加载时外部 CSS 未加载导致无样式 */
+      :root, body {
+        --bg: #faf9f6; --paper: #faf9f6; --paper-card: #ffffff; --paper-deep: #f5f4f0;
+        --seal: #b5342e; --seal-deep: #9a2a24; --seal-soft: #d45a52; --seal-glow: rgba(181,52,46,0.08);
+        --cream: #1a1a1a; --ink: #1a1a1a; --ink-soft: #4a4a4a; --ink-faint: #808080;
+        --text: #1a1a1a; --text-soft: #4a4a4a; --text-muted: #808080; --text-faint: #b3b3b3;
+        --line: rgba(0,0,0,0.08); --line-soft: rgba(0,0,0,0.04);
+        --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+        --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        --font-kai: "STKaiti", "KaiTi", "楷体", serif;
+        --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        --chat-max: 1600PX; --margin: clamp(32rpx, 4vw, 80rpx);
+        --radius-sm: 8rpx; --radius-md: 16rpx; --radius-lg: 28rpx; --radius-xl: 36rpx;
+        --shadow-card: 0 2rpx 16rpx rgba(0,0,0,0.05); --shadow-raised: 0 8rpx 32rpx rgba(0,0,0,0.08);
+        --card: #ffffff; --border: rgba(0,0,0,0.08); --border-ink: rgba(26,26,26,0.08); --border-faint: rgba(0,0,0,0.04);
+        --cinnabar: #b5342e;
+      }
+      body { background-color: #faf9f6; color: #1a1a1a; font-family: "Noto Sans SC", sans-serif; margin: 0; }
+      #app { min-height: 100vh; }
+      /* 桌面端强制覆盖 Taro 内联脚本的 fontSize */
+      @media (min-width: 768px) {
+        html { font-size: 22PX !important; }
+        #app > * { max-width: calc(1600PX + clamp(32rpx, 4vw, 80rpx) * 2); margin: 0 auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script><%= htmlWebpackPlugin.options.script %></script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+page,
+body {
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-soft: #4a4a4a;
+  --text-muted: #808080;
+  --text-faint: #b3b3b3;
+  --line: rgba(0,0,0,0.08);
+  --line-soft: rgba(0,0,0,0.04);
+  --line-strong: rgba(0,0,0,0.15);
+  --margin: clamp(32rpx, 4vw, 80rpx);
+  --chat-max: 1600rpx;
+  --content-max: 2000rpx;
+
+  --seal: #b5342e;
+  --seal-soft: #d45a52;
+  --seal-deep: #9a2a24;
+  --seal-glow: rgba(181, 52, 46, 0.08);
+
+  --paper: #faf9f6;
+  --paper-card: #ffffff;
+  --paper-deep: #f5f4f0;
+
+  --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --font-body: 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-kai: 'STKaiti', 'KaiTi', '楷体', var(--font-display);
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  --radius-sm: 8rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 28rpx;
+  --radius-xl: 36rpx;
+  --radius-full: 9999rpx;
+
+  --shadow-card: 0 2rpx 16rpx rgba(0,0,0,0.05);
+  --shadow-raised: 0 8rpx 32rpx rgba(0,0,0,0.08);
+  --shadow-input: inset 0 2rpx 8rpx rgba(0,0,0,0.04);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.15s;
+  --dur-normal: 0.25s;
+
+  /* 语义别名（向后兼容） */
+  --cream: #1a1a1a;
+  --ink: #1a1a1a;
+  --ink-soft: #4a4a4a;
+  --ink-faint: #808080;
+  --input-bg: #f5f4f0;
+  --card: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --border-ink: rgba(26,26,26,0.08);
+  --border-faint: rgba(0,0,0,0.04);
+  --cinnabar: #b5342e;
+}
+
+.kai {
+  font-family: var(--font-kai);
+  letter-spacing: 2rpx;
+}
+
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8rpx); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(40rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

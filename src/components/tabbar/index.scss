@@ -1,0 +1,127 @@
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  background: var(--paper-card);
+  border-top: 1px solid var(--line);
+}
+.tabbar.hide-mobile {
+  display: none;
+}
+.sb-head,
+.sb-recent {
+  display: none;
+}
+.sb-nav {
+  display: flex;
+  height: 104rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.tab-label {
+  font-size: 28rpx;
+  color: var(--ink-soft);
+  letter-spacing: 3rpx;
+}
+.tab-item.on .tab-label {
+  color: var(--seal);
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .tabbar.hide-mobile {
+    display: flex;
+  }
+  .tabbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: auto;
+    padding: 48rpx var(--margin) 28rpx;
+    background: rgba(252,251,249,0.92);
+    backdrop-filter: blur(16rpx);
+    -webkit-backdrop-filter: blur(16rpx);
+    border-top: none;
+    border-bottom: 1px solid var(--line);
+    z-index: 100;
+    box-sizing: border-box;
+  }
+  .sb-head {
+    display: block;
+  }
+  .sb-seal {
+    display: none;
+  }
+  .sb-head-text {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+  }
+  .sb-brand {
+    font-family: var(--font-display);
+    font-size: 64rpx;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--seal);
+  }
+  .sb-brand-sub {
+    font-family: var(--font-display);
+    font-size: 30rpx;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    margin-left: 32rpx;
+    align-self: flex-end;
+    padding-bottom: 16rpx;
+  }
+  .sb-nav {
+    flex: none;
+    flex-direction: row;
+    height: auto;
+    padding: 0;
+    gap: 56rpx;
+  }
+  .tab-item {
+    flex: none;
+    height: auto;
+    padding: 12rpx 0;
+    border-bottom: 4rpx solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    cursor: pointer;
+  }
+  .tab-item:hover {
+    border-bottom-color: var(--seal);
+  }
+  .tab-item.on {
+    border-bottom-color: var(--seal);
+    background: transparent;
+    box-shadow: none;
+  }
+  .tab-item.on .tab-label,
+  .tab-item:hover .tab-label {
+    color: var(--seal);
+  }
+  .tab-label {
+    font-size: 34rpx;
+    font-family: var(--font-body);
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+  }
+  .sb-recent {
+    display: none;
+  }
+}

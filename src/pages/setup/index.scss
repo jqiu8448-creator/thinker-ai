@@ -1,0 +1,112 @@
+/* ===== 设置页（初始配置）===== */
+
+.setup {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 160rpx 80rpx 120rpx;
+  box-sizing: border-box;
+  color: var(--text);
+  font-family: var(--font-display);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 56rpx,
+      rgba(0,0,0,0.008) 56rpx,
+      rgba(0,0,0,0.008) 58rpx
+    );
+}
+
+.s-brand {
+  text-align: center;
+  margin-bottom: 120rpx;
+}
+.s-title {
+  font-size: 112rpx;
+  color: var(--cream);
+  letter-spacing: 8rpx;
+}
+.s-sub {
+  margin-top: 32rpx;
+  font-size: 52rpx;
+  color: var(--ink-faint);
+}
+
+.s-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 80rpx 72rpx;
+  box-shadow: var(--shadow-card);
+}
+.s-card-title {
+  font-size: 68rpx;
+  color: var(--cream);
+  margin-bottom: 32rpx;
+}
+.s-tip {
+  font-size: 48rpx;
+  line-height: 1.7;
+  color: var(--ink-faint);
+  margin-bottom: 72rpx;
+}
+
+.s-label {
+  font-size: 52rpx;
+  color: var(--cream);
+  margin: 56rpx 0 24rpx;
+}
+.s-input {
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: 24rpx;
+  padding: 44rpx 48rpx;
+  font-size: 56rpx;
+  color: var(--text);
+}
+.s-ph {
+  color: var(--ink-faint);
+}
+
+.s-test {
+  margin-top: 64rpx;
+}
+.s-test-btn {
+  background: transparent;
+  border: 1px solid var(--cream);
+  color: var(--cream);
+  border-radius: 24rpx;
+  font-size: 56rpx;
+}
+.s-test-result {
+  display: block;
+  margin-top: 36rpx;
+  font-size: 48rpx;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.s-save {
+  margin-top: 96rpx;
+  background: var(--cream);
+  color: var(--surface);
+  border-radius: var(--radius-md);
+  font-size: 64rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.12);
+}
+
+.s-foot {
+  margin-top: 80rpx;
+  text-align: center;
+  font-size: 44rpx;
+  color: var(--ink-faint);
+}
+
+@media (min-width: 768px) {
+  .setup {
+    padding: 240rpx var(--margin) 120rpx;
+    max-width: 1280rpx;
+    margin: 0 auto;
+  }
+}

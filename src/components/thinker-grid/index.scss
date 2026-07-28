@@ -1,0 +1,137 @@
+.tg {
+  width: 100%;
+}
+.tg-search-bar {
+  padding: 20rpx 28rpx 28rpx;
+}
+.tg-search {
+  width: 100%;
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 24rpx 32rpx;
+  color: var(--text);
+  font-size: 30rpx;
+}
+.tg-ph {
+  color: var(--ink-faint);
+}
+
+.tg-scroll {
+  width: 100%;
+}
+.tg-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  padding: 0 8rpx;
+}
+
+.tg-cell {
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .tg-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280rpx, 1fr));
+    gap: 24rpx;
+  }
+}
+@media (min-width: 1200px) {
+  .tg-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320rpx, 1fr));
+  }
+}
+
+.tg-card {
+  position: relative;
+  min-height: 176rpx;
+  height: 100%;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28rpx 28rpx 24rpx;
+  overflow: hidden;
+  transition: all var(--dur-fast) var(--ease-out);
+  box-shadow: var(--shadow-card);
+}
+.tg-card:active {
+  border-color: var(--seal);
+  box-shadow: var(--shadow-raised);
+}
+.tg-card.on {
+  border-color: var(--seal);
+  background: var(--seal-glow);
+  box-shadow: 0 0 0 2rpx rgba(181,52,46,0.15) inset;
+}
+.tg-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 20rpx;
+  color: var(--text);
+  background: var(--paper-deep);
+  border-bottom-left-radius: 16rpx;
+  padding: 8rpx 18rpx;
+  letter-spacing: 1rpx;
+}
+.tg-tick {
+  position: absolute;
+  bottom: 16rpx;
+  right: 22rpx;
+  color: var(--seal);
+  font-size: 34rpx;
+}
+.tg-name {
+  font-size: 40rpx;
+  color: var(--seal);
+  font-family: var(--font-display);
+  letter-spacing: 3rpx;
+  margin-bottom: 8rpx;
+  padding-right: 120rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tg-cat {
+  display: block;
+  font-size: 22rpx;
+  color: var(--ink-faint);
+  margin-bottom: 10rpx;
+  padding-right: 16rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tg-meta {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  line-height: 1.4;
+  padding-right: 16rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.tg-field {
+  flex: none;
+  color: var(--ink-faint);
+}
+.tg-dot {
+  flex: none;
+  color: var(--ink-faint);
+  margin: 0 12rpx;
+}
+.tg-works {
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tg-empty {
+  display: block;
+  text-align: center;
+  color: var(--ink-faint);
+  padding: 80rpx 0;
+  font-size: 30rpx;
+}
