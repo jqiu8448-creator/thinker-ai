@@ -1118,11 +1118,11 @@ taro-textarea-core.input-field textarea {
   min-height: 120rpx;
   border: none;
   color: var(--text) !important;
-  font-size: 30rpx;
+  font-size: 26rpx;
   letter-spacing: 2rpx;
   font-family: var(--font-sans) !important;
   padding: 40rpx 32rpx;
-  line-height: 1.7;
+  line-height: 65px;
   text-align: center !important;
   background: transparent !important;
   outline: none !important;
@@ -1169,6 +1169,7 @@ taro-textarea-core.input-field textarea,
   margin: 0 !important;
   text-align: center !important;
   font-family: var(--font-sans) !important;
+  line-height: 65px !important;
   overflow: hidden !important;
 }
 
