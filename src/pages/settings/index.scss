@@ -13,6 +13,7 @@
   text-align: center;
   padding: 32rpx 0 24rpx;
   letter-spacing: 3rpx;
+  animation: fade-in 0.4s var(--ease-out) both;
 }
 .loading {
   flex: 1;
@@ -101,6 +102,7 @@
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
+  animation: fade-in 0.4s var(--ease-out) 0.08s both;
 }
 .setting-row {
   display: flex;
@@ -308,12 +310,14 @@
   font-family: var(--font-display);
   letter-spacing: 4rpx;
   margin: 16rpx 24rpx 24rpx;
+  animation: fade-in 0.4s var(--ease-out) 0.16s both;
 }
 .func-grid {
   flex: none;
   display: flex;
   flex-wrap: wrap;
   padding: 0 20rpx;
+  animation: fade-in 0.4s var(--ease-out) 0.24s both;
 }
 .func {
   width: 33.33%;
