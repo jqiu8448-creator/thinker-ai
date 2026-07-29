@@ -979,7 +979,7 @@ export default function Huiyin() {
             <Textarea
               className="input-field"
               value={inputValue}
-              placeholder="说出你的话题或困惑…"
+              placeholder=""
               placeholderClass="ph"
               onInput={onInput}
               onConfirm={onSend}
