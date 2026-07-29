@@ -734,7 +734,7 @@ export default function Huiyin() {
   };
 
   return (
-    <View className="container">
+    <View className="container page-enter">
       <Tabbar current="huiyin" />
 
       {/* 桌面端：左侧历史侧边栏 */}

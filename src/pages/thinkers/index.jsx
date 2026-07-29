@@ -380,7 +380,7 @@ export default function Thinkers() {
   };
 
   return (
-    <View className="page">
+    <View className="page page-enter">
       <Tabbar current="thinkers" />
       <View className="hint kai">遍览先贤 · 点选即谈</View>
 

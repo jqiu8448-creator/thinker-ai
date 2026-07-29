@@ -306,7 +306,7 @@ export default function Settings() {
   };
 
   return (
-    <View className="page">
+    <View className="page page-enter">
       <Tabbar current="settings" />
       <View className="hint kai">设置 · 对话之余</View>
 

@@ -351,7 +351,7 @@ export default function Home() {
   const q = QUOTES[quoteIdx];
 
   return (
-    <View className="page">
+    <View className="page page-enter">
       {showSplash && <Splash onEnter={() => setShowSplash(false)} />}
       <Tabbar current="home" />
 
