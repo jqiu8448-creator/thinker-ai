@@ -829,17 +829,6 @@ export default function Huiyin() {
           className="chat-area"
           ref={chatAreaRef}
         >
-          {recommending && (
-            <View className="recommending">
-              <View className="r-ink-ripple">
-                <View className="r-ripple-dot" />
-                <View className="r-ripple-ring" />
-                <View className="r-ripple-ring r-ripple-ring-2" />
-              </View>
-              <View className="r-text kai">{RECOMMENDING_WORDS}</View>
-            </View>
-          )}
-
           {welcome && (
             <View className="welcome">
               <View className="w-seal-wrap">
@@ -879,7 +868,6 @@ export default function Huiyin() {
                     <View className="msg-stripe" />
                     <View className="msg-inner">{item.content}</View>
                   </View>
-                  <View className="msg-delete" onClick={() => deleteMsg(item.id)}>×</View>
                 </View>
               );
             }
@@ -902,7 +890,6 @@ export default function Huiyin() {
                       {item.streaming && <Text className="stream-cursor">▍</Text>}
                     </Text>
                   </View>
-                  <View className="msg-delete" onClick={() => deleteMsg(item.id)}>×</View>
                 </View>
               );
             }
@@ -935,7 +922,6 @@ export default function Huiyin() {
                       </View>
                     ))}
                   </View>
-                  <View className="msg-delete" onClick={() => deleteMsg(item.id)}>×</View>
                 </View>
               );
             }
@@ -947,7 +933,6 @@ export default function Huiyin() {
               >
                 <View className="sys-dot" />
                 {item.content}
-                <View className="msg-delete" onClick={() => deleteMsg(item.id)}>×</View>
               </View>
             );
           })}
