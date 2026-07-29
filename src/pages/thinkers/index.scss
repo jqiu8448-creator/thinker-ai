@@ -10,12 +10,12 @@
   text-align: center;
   padding: 32rpx 0 24rpx;
   letter-spacing: 3rpx;
-  animation: fade-in 0.4s var(--ease-out) both;
+  animation: page-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .cards {
   padding: 24rpx 0 40rpx;
-  animation: fade-in 0.4s var(--ease-out) 0.08s both;
+  animation: page-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
 }
 
 .d-mask {
