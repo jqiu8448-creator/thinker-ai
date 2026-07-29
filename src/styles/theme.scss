@@ -99,10 +99,10 @@ body {
   to { opacity: 1; }
 }
 
-/* 统一页面入场动画：淡入上浮 */
+/* 统一页面入场动画：淡入（不用 transform，避免破坏子元素 position:fixed） */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(20rpx); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .page-enter {
   animation: page-enter 0.4s var(--ease-out) both;
