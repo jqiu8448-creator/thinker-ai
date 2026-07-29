@@ -5,7 +5,6 @@ import { callCloud } from '@/utils/cloud';
 import { getGlobal, ensureWatermark } from '@/utils/global';
 import Loading from '@/components/loading';
 import ThinkerGrid from '@/components/thinker-grid';
-import Tabbar from '@/components/tabbar';
 import './index.scss';
 
 function countryRank(c) {
@@ -381,7 +380,6 @@ export default function Thinkers() {
 
   return (
     <View className="page page-enter">
-      <Tabbar current="thinkers" />
       <View className="hint kai">遍览先贤 · 点选即谈</View>
 
       <View className="cards">

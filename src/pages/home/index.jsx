@@ -4,7 +4,6 @@ import Taro, { useDidShow } from '@tarojs/taro';
 import { ensureApiConfig, hasApiConfig } from '@/utils/api-config';
 import { callCloud } from '@/utils/cloud';
 import { getGlobal } from '@/utils/global';
-import Tabbar from '@/components/tabbar';
 import Splash from '@/components/splash';
 import thinkersData from '@/data/thinkers.json';
 import './index.scss';
@@ -353,7 +352,6 @@ export default function Home() {
   return (
     <View className="page page-enter">
       {showSplash && <Splash onEnter={() => setShowSplash(false)} />}
-      <Tabbar current="home" />
 
       {/* 标题 */}
       <View className={`hero step-${step}`}>

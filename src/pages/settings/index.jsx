@@ -8,7 +8,6 @@ import { stressTest } from '@/utils/llm';
 import { modeName } from '@/utils/modes';
 import { isHosted, getHostedConfig, hostedHeaders } from '@/utils/hosted';
 import Popup from '@/components/popup';
-import Tabbar from '@/components/tabbar';
 import './index.scss';
 
 function fmt(ts) {
@@ -307,7 +306,6 @@ export default function Settings() {
 
   return (
     <View className="page page-enter">
-      <Tabbar current="settings" />
       <View className="hint kai">设置 · 对话之余</View>
 
       {/* 保留数量 */}

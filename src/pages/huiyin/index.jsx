@@ -6,7 +6,6 @@ import { getGlobal, applyFontScaleToDom } from '@/utils/global';
 import { ensureApiConfig } from '@/utils/api-config';
 import { isHosted } from '@/utils/hosted';
 import { modeName, fmtTime } from '@/utils/modes';
-import Tabbar from '@/components/tabbar';
 import './index.scss';
 
 const THINKING_WORDS = [
@@ -735,8 +734,6 @@ export default function Huiyin() {
 
   return (
     <View className="container page-enter">
-      <Tabbar current="huiyin" />
-
       {/* 桌面端：左侧历史侧边栏 */}
       <View className={`sidebar ${historyOpen ? 'open' : 'closed'}`}>
         <View className="sidebar-head">
