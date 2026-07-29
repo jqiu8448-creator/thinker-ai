@@ -872,6 +872,7 @@ export default function Huiyin() {
               );
             }
             if (item.role === 'assistant') {
+              const isThinkingPlaceholder = item.streaming && !(item.content && item.content.trim());
               return (
                 <View
                   key={item.id}
@@ -884,12 +885,26 @@ export default function Huiyin() {
                     )}
                     {item.thinker && <View className="thinker-label kai">{item.thinker}</View>}
                   </View>
-                  <View className="msg-bubble">
-                    <Text className="content" userSelect>
-                      {item.content}
-                      {item.streaming && <Text className="stream-cursor">▍</Text>}
-                    </Text>
-                  </View>
+                  {isThinkingPlaceholder ? (
+                    <View className="thinking-inline kai">
+                      <View className="thinking-ink">
+                        <View className="ink-drop" />
+                        <View className="ink-ring ink-ring-1" />
+                        <View className="ink-ring ink-ring-2" />
+                      </View>
+                      <View className="thinking-inline-body">
+                        <Text className="thinking-text">{thinkingWord}</Text>
+                        <Text className="thinking-cancel" onClick={cancelThinking}>取消</Text>
+                      </View>
+                    </View>
+                  ) : (
+                    <View className="msg-bubble">
+                      <Text className="content" userSelect>
+                        {item.content}
+                        {item.streaming && <Text className="stream-cursor">▍</Text>}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               );
             }
@@ -936,20 +951,6 @@ export default function Huiyin() {
               </View>
             );
           })}
-
-          {typing && !messages.some((m) => m.streaming && m.content) && (
-            <View className="thinking kai">
-              <View className="thinking-ink">
-                <View className="ink-drop" />
-                <View className="ink-ring ink-ring-1" />
-                <View className="ink-ring ink-ring-2" />
-              </View>
-              <View className="thinking-body">
-                <Text className="thinking-text">{thinkingWord}</Text>
-                <Text className="thinking-cancel" onClick={cancelThinking}>取消</Text>
-              </View>
-            </View>
-          )}
         </View>
 
         <View className="input-area">

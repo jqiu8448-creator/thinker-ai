@@ -8,7 +8,7 @@
   flex-direction: column;
   min-height: 100vh;
   background: var(--paper);
-  padding: 0 40rpx 104rpx;
+  padding-bottom: 104rpx;
   box-sizing: border-box;
 }
 
@@ -432,7 +432,7 @@
 /* ===== 对话区域 ===== */
 .chat-area {
   flex: 1;
-  padding: 48rpx 0 calc(240rpx + 120rpx);
+  padding: 48rpx 32rpx calc(240rpx + 120rpx);
   display: flex;
   flex-direction: column;
 }
@@ -464,44 +464,16 @@
   margin-top: 16rpx;
 }
 
-/* 删除按钮：悬停显示 */
+/* 删除按钮：用户要求彻底移除 */
 .msg-delete {
-  position: absolute;
-  top: -12rpx;
-  right: -12rpx;
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
-  background: var(--seal);
-  color: #fff;
-  font-size: 32rpx;
-  line-height: 48rpx;
-  text-align: center;
-  opacity: 0;
-  cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-out);
-  box-shadow: 0 2rpx 8rpx rgba(181, 52, 46, 0.3);
-  z-index: 10;
+  display: none !important;
+  pointer-events: none;
 }
 
-.msg:hover .msg-delete,
-.msg-delete:active {
-  opacity: 1;
-}
-
-.msg-delete:active {
-  transform: scale(0.9);
-}
-
-/* 桌面端删除按钮 */
+/* 桌面端删除按钮（已移除，保持display:none避免冲突） */
 @media (min-width: 768px) {
   .msg-delete {
-    width: 40rpx;
-    height: 40rpx;
-    font-size: 28rpx;
-    line-height: 40rpx;
-    top: -8rpx;
-    right: -8rpx;
+    display: none !important;
   }
 }
 
@@ -669,15 +641,59 @@ taro-text-core.content,
   opacity: 0.5;
 }
 
-/* --- 思考中状态 · 墨滴涟漪 --- */
-.thinking {
-  align-self: flex-start;
+/* --- 流式光标 --- */
+.stream-cursor {
+  color: var(--seal);
+  font-weight: normal;
+  margin-left: 6rpx;
+  animation: blink-cursor 1s step-end infinite;
+}
+
+/* --- 内嵌思考中（在assistant消息里，无空气泡，直接放消息头下方） --- */
+.thinking-inline {
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding: 28rpx 40rpx;
-  margin-bottom: 56rpx;
+  gap: 20rpx;
+  padding: 4rpx 0 0;
 }
+.thinking-inline-body {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.thinking-inline .thinking-text {
+  font-size: 28rpx;
+  color: var(--text-muted);
+  font-family: var(--font-kai);
+  letter-spacing: 4rpx;
+  animation: thinking-fade 2.5s ease-in-out infinite;
+}
+.thinking-inline .thinking-cancel {
+  font-size: 24rpx;
+  color: var(--seal);
+  margin-left: 20rpx;
+  cursor: pointer;
+  opacity: 0.7;
+  min-height: 88rpx;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.thinking-inline .thinking-cancel:active {
+  opacity: 1;
+}
+
+/* --- 旧独立思考中块（已移除，避免重复显示） --- */
+.thinking {
+  display: none !important;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* --- 系统消息 · 居中无气泡 --- */
 
 .thinking-ink {
   position: relative;
@@ -966,17 +982,12 @@ taro-text-core.content,
 .w-hint {
   font-size: 24rpx;
   color: var(--text-faint);
-  padding: 0 28rpx;
-  min-height: 88rpx;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: 8rpx 20rpx;
   border: 1px solid var(--line);
   border-radius: 4rpx;
   cursor: pointer;
   transition: all var(--dur-fast) var(--ease-out);
   letter-spacing: 2rpx;
-  box-sizing: border-box;
 }
 
 .w-hint:active {
@@ -990,55 +1001,20 @@ taro-text-core.content,
   font-size: 20rpx;
 }
 
-/* ===== 延请中 · 墨迹涟漪 ===== */
-.recommending {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 160rpx 0;
-}
-
-.r-ink-ripple {
-  position: relative;
-  width: 80rpx;
-  height: 80rpx;
-  margin-bottom: 36rpx;
-}
-
-.r-ripple-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 16rpx;
-  height: 16rpx;
-  background: var(--seal);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: ink-pulse 1.8s ease-in-out infinite;
-}
-
-.r-ripple-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80rpx;
-  height: 80rpx;
-  border: 1px solid var(--seal);
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0.4);
-  opacity: 0;
-  animation: ink-ripple 2s ease-out infinite;
-}
-
-.r-ripple-ring-2 {
-  animation-delay: 0.7s;
-}
-
+/* ===== 延请中（已移除中间大号等待框） ===== */
+.recommending,
+.r-ink-ripple,
+.r-ripple-dot,
+.r-ripple-ring,
+.r-ripple-ring-2,
 .r-text {
-  font-size: 30rpx;
-  color: var(--text-muted);
-  letter-spacing: 4rpx;
+  display: none !important;
+  visibility: hidden;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* ===== 输入区 ===== */
@@ -1048,7 +1024,7 @@ taro-text-core.content,
   left: 0;
   right: 0;
   z-index: 40;
-  padding: 20rpx 40rpx 24rpx;
+  padding: 20rpx 40rpx calc(24rpx + env(safe-area-inset-bottom));
   background: linear-gradient(to bottom, rgba(250,249,246,0), var(--paper) 30%);
 }
 
@@ -1104,14 +1080,14 @@ taro-textarea-core.input-field,
 taro-textarea-core.input-field textarea {
   flex: 1;
   min-width: 0;
-  min-height: 120rpx;
+  min-height: 96rpx;
   border: none;
   color: var(--text) !important;
   font-size: 26rpx;
   letter-spacing: 2rpx;
   font-family: var(--font-sans) !important;
-  padding: 40rpx 32rpx;
-  line-height: 130rpx;
+  padding: 20rpx 32rpx;
+  line-height: 56rpx;
   text-align: center !important;
   background: transparent !important;
   outline: none !important;
@@ -1121,6 +1097,7 @@ taro-textarea-core.input-field textarea {
   -webkit-appearance: none !important;
   appearance: none !important;
   user-select: auto;
+  box-sizing: border-box;
 }
 .input-field .weui-input {
   text-align: center !important;
@@ -1128,6 +1105,9 @@ taro-textarea-core.input-field textarea {
   color: var(--text) !important;
   font-size: 30rpx;
   letter-spacing: 2rpx;
+  line-height: 56rpx;
+  padding: 0;
+  margin: 0;
 }
 .input-field .weui-input::placeholder,
 .input-field .ph,
@@ -1158,8 +1138,9 @@ taro-textarea-core.input-field textarea,
   margin: 0 !important;
   text-align: center !important;
   font-family: var(--font-sans) !important;
-  line-height: 130rpx !important;
+  line-height: 56rpx !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 /* placeholder 也居中 */
