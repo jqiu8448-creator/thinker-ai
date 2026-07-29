@@ -29,7 +29,8 @@ export async function generateText({ model, messages, temperature = 0.7, topP = 
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 60000);
-  if (signal) signal.addEventListener('abort', () => controller.abort());
+  const onAbort = () => controller.abort();
+  if (signal) signal.addEventListener('abort', onAbort, { once: true });
 
   let resp;
   try {
@@ -50,6 +51,7 @@ export async function generateText({ model, messages, temperature = 0.7, topP = 
     });
   } finally {
     clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', onAbort);
   }
 
   if (!resp.ok) {
@@ -91,10 +93,15 @@ export async function generateTextStream({ model, messages, temperature = 0.7, t
   }
   const usedModel = cfg.model || model || 'gpt-3.5-turbo';
 
-  // 流式也需要超时控制，避免连接挂起导致 typing 永久卡死
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 300000); // 流式给 5 分钟，长文生成不会被截断
-  if (signal) signal.addEventListener('abort', () => controller.abort());
+  const timeoutId = setTimeout(() => controller.abort(), 300000);
+  const onAbort = () => controller.abort();
+  if (signal) signal.addEventListener('abort', onAbort, { once: true });
+
+  const cleanup = () => {
+    clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', onAbort);
+  };
 
   const post = (stream) =>
     fetch(`${cfg.baseUrl}/chat/completions`, {
@@ -114,62 +121,58 @@ export async function generateTextStream({ model, messages, temperature = 0.7, t
       signal: controller.signal,
     });
 
-  // 非流式兜底（供降级使用）
   const fallbackNonStream = async () => {
     const full = await generateText({ model: usedModel, messages, temperature, topP, maxTokens });
     if (onToken) onToken(full);
     return full;
   };
 
-  let resp;
   try {
-    resp = await post(true);
-  } catch (e) {
-    // 网络层不支持流式（极少数环境），尝试非流式
-    return await fallbackNonStream();
-  }
-
-  if (!resp.ok) {
-    let detail = '';
+    let resp;
     try {
-      detail = (await resp.text()).slice(0, 300);
-    } catch (e) {}
-    // 部分网关拒绝 stream 请求，降级为非流式
-    return await fallbackNonStream().catch(() => {
-      throw new Error(`API HTTP ${resp.status}：${detail}`);
-    });
-  }
-
-  const contentType = resp.headers && resp.headers.get ? resp.headers.get('content-type') || '' : '';
-  if (!resp.body || !resp.body.getReader || !contentType || !/text\/event-stream/.test(contentType)) {
-    // 明确非事件流，降级为非流式
-    return await fallbackNonStream();
-  }
-
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder('utf-8');
-  let buffer = '';
-  let full = '';
-
-  const consumeLine = (rawLine) => {
-    const line = rawLine.trim();
-    if (!line || !line.startsWith('data:')) return;
-    const payload = line.slice(5).trim();
-    if (payload === '[DONE]') return;
-    let json;
-    try {
-      json = JSON.parse(payload);
+      resp = await post(true);
     } catch (e) {
-      return; // 跳过无法解析的片段
+      return await fallbackNonStream();
     }
-    const delta = json?.choices?.[0]?.delta?.content;
-    if (delta) {
-      full += delta;
-      if (onToken) onToken(delta);
-    }
-  };
 
-  try {
+    if (!resp.ok) {
+      let detail = '';
+      try {
+        detail = (await resp.text()).slice(0, 300);
+      } catch (e) {}
+      return await fallbackNonStream().catch(() => {
+        throw new Error(`API HTTP ${resp.status}：${detail}`);
+      });
+    }
+
+    const contentType = resp.headers && resp.headers.get ? resp.headers.get('content-type') || '' : '';
+    if (!resp.body || !resp.body.getReader || !contentType || !/text\/event-stream/.test(contentType)) {
+      return await fallbackNonStream();
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let full = '';
+
+    const consumeLine = (rawLine) => {
+      const line = rawLine.trim();
+      if (!line || !line.startsWith('data:')) return;
+      const payload = line.slice(5).trim();
+      if (payload === '[DONE]') return;
+      let json;
+      try {
+        json = JSON.parse(payload);
+      } catch (e) {
+        return;
+      }
+      const delta = json?.choices?.[0]?.delta?.content;
+      if (delta) {
+        full += delta;
+        if (onToken) onToken(delta);
+      }
+    };
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -181,13 +184,12 @@ export async function generateTextStream({ model, messages, temperature = 0.7, t
         consumeLine(line);
       }
     }
-    // 收尾：处理最后一行（可能无结尾换行）
     if (buffer.trim()) consumeLine(buffer);
-  } finally {
-    clearTimeout(timeoutId);
-  }
 
-  return full;
+    return full;
+  } finally {
+    cleanup();
+  }
 }
 
 /**
@@ -524,7 +526,8 @@ async function readSSEStream(resp, onToken) {
 async function generateTextHosted({ messages, temperature, topP, maxTokens, signal }) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 120000);
-  if (signal) signal.addEventListener('abort', () => controller.abort());
+  const onAbort = () => controller.abort();
+  if (signal) signal.addEventListener('abort', onAbort, { once: true });
 
   let resp;
   try {
@@ -536,6 +539,7 @@ async function generateTextHosted({ messages, temperature, topP, maxTokens, sign
     });
   } finally {
     clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', onAbort);
   }
 
   if (!resp.ok) {
@@ -552,8 +556,9 @@ async function generateTextHosted({ messages, temperature, topP, maxTokens, sign
 // 托管模式：流式调用
 async function generateTextStreamHosted({ messages, temperature, topP, maxTokens, onToken, signal }) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 300000); // 流式 5 分钟
-  if (signal) signal.addEventListener('abort', () => controller.abort());
+  const timeoutId = setTimeout(() => controller.abort(), 300000);
+  const onAbort = () => controller.abort();
+  if (signal) signal.addEventListener('abort', onAbort, { once: true });
 
   let resp;
   try {
@@ -565,6 +570,7 @@ async function generateTextStreamHosted({ messages, temperature, topP, maxTokens
     });
   } finally {
     clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', onAbort);
   }
 
   if (!resp.ok) {

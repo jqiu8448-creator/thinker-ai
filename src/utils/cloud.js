@@ -30,6 +30,10 @@ async function consumeHostedQuota() {
       const data = await resp.json().catch(() => ({}));
       return { ok: true, remaining: data.remaining, limit: data.limit };
     }
+    // 404：旧版服务器未实现配额接口，视为无限，直接放行（向后兼容）
+    if (resp.status === 404) {
+      return { ok: true, remaining: Infinity, limit: Infinity };
+    }
     if (resp.status === 429) {
       const data = await resp.json().catch(() => ({}));
       return { ok: false, error: data.error || '今日配额已用完，明日重置' };
@@ -39,7 +43,9 @@ async function consumeHostedQuota() {
     }
     return { ok: false, error: `配额检查失败（HTTP ${resp.status}）` };
   } catch (e) {
-    return { ok: false, error: '网络异常：' + e.message };
+    // 网络层失败也视为临时放行，避免前端因为一次网络抖动彻底无法对话
+    console.warn('[cloud] consumeHostedQuota 网络异常，临时放行:', e.message);
+    return { ok: true, remaining: Infinity, limit: Infinity };
   }
 }
 
@@ -183,9 +189,7 @@ export async function callCloud(action, data = {}, opts = {}) {
       case 'recommend': {
         const topic = (data.topic || '').trim();
         if (!topic) return finish(fail('请提供话题'));
-        console.log('[cloud] recommend 开始, topic:', topic);
         const thinkers = await recommend_thinkers(topic);
-        console.log('[cloud] recommend 返回:', thinkers);
         return finish(ok({ thinkers }));
       }
       case 'chat': {
@@ -196,44 +200,41 @@ export async function callCloud(action, data = {}, opts = {}) {
         if (!message) return finish(fail('消息不能为空'));
         if (!thinker) return finish(fail('请指定思想家'));
 
-        // 托管模式：扣减每日提问配额（每人每天 3 题）
+        let quotaRemaining = undefined;
         if (isHosted()) {
           const quotaResult = await consumeHostedQuota();
           if (!quotaResult.ok) {
             return finish(fail(quotaResult.error || '今日配额已用完'));
           }
-          // 把剩余配额带上，前端可以提示
-          const session = store.get_or_create_session(data.sessionId);
-          if (topic) session.topic = topic;
-          if (Array.isArray(data.panel) && data.panel.length) {
-            session._panel = data.panel;
-          } else if (data.panel === null) {
-            session._panel = null;
-          }
-          try {
-            const result = await _do_chat(session, {
-              message,
-              thinker,
-              mode,
-              onToken: data.onToken,
-              signal: data.signal,
-            });
-            return finish(ok({ ...result, thinker, mode, sessionId: session.session_id, quotaRemaining: quotaResult.remaining }));
-          } catch (e) {
-            return finish(fail(e.message || '对话失败'));
-          }
+          quotaRemaining = quotaResult.remaining;
         }
 
         const session = store.get_or_create_session(data.sessionId);
         if (topic) session.topic = topic;
-        // 仅在明确传入 panel 时才覆盖，undefined 时保留已有值
         if (Array.isArray(data.panel) && data.panel.length) {
           session._panel = data.panel;
         } else if (data.panel === null) {
           session._panel = null;
         }
-        const result = await _do_chat(session, { message, thinker, mode, onToken: data.onToken, signal: data.signal });
-        return finish(ok({ ...result, thinker, mode, sessionId: session.session_id }));
+
+        try {
+          const result = await _do_chat(session, {
+            message,
+            thinker,
+            mode,
+            onToken: data.onToken,
+            signal: data.signal,
+          });
+          return finish(ok({
+            ...result,
+            thinker,
+            mode,
+            sessionId: session.session_id,
+            ...(quotaRemaining !== undefined ? { quotaRemaining } : {}),
+          }));
+        } catch (e) {
+          return finish(fail(e.message || '对话失败'));
+        }
       }
       case 'suggest_panel': {
         const topic = (data.topic || '').trim();

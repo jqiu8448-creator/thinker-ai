@@ -8,7 +8,7 @@
   flex-direction: column;
   min-height: 100vh;
   background: var(--paper);
-  padding-bottom: 104rpx;
+  padding: 0 40rpx 104rpx;
   box-sizing: border-box;
 }
 
@@ -432,7 +432,7 @@
 /* ===== 对话区域 ===== */
 .chat-area {
   flex: 1;
-  padding: 48rpx 32rpx calc(240rpx + 120rpx);
+  padding: 48rpx 0 calc(240rpx + 120rpx);
   display: flex;
   flex-direction: column;
 }
@@ -966,12 +966,17 @@ taro-text-core.content,
 .w-hint {
   font-size: 24rpx;
   color: var(--text-faint);
-  padding: 8rpx 20rpx;
+  padding: 0 28rpx;
+  min-height: 88rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--line);
   border-radius: 4rpx;
   cursor: pointer;
   transition: all var(--dur-fast) var(--ease-out);
   letter-spacing: 2rpx;
+  box-sizing: border-box;
 }
 
 .w-hint:active {
@@ -1039,11 +1044,11 @@ taro-text-core.content,
 /* ===== 输入区 ===== */
 .input-area {
   position: fixed;
-  bottom: 104rpx;
+  bottom: calc(104rpx + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   z-index: 40;
-  padding: 20rpx 16rpx calc(24rpx + env(safe-area-inset-bottom));
+  padding: 20rpx 40rpx 24rpx;
   background: linear-gradient(to bottom, rgba(250,249,246,0), var(--paper) 30%);
 }
 
@@ -1106,7 +1111,7 @@ taro-textarea-core.input-field textarea {
   letter-spacing: 2rpx;
   font-family: var(--font-sans) !important;
   padding: 40rpx 32rpx;
-  line-height: 65px;
+  line-height: 130rpx;
   text-align: center !important;
   background: transparent !important;
   outline: none !important;
@@ -1153,7 +1158,7 @@ taro-textarea-core.input-field textarea,
   margin: 0 !important;
   text-align: center !important;
   font-family: var(--font-sans) !important;
-  line-height: 65px !important;
+  line-height: 130rpx !important;
   overflow: hidden !important;
 }
 

@@ -1,8 +1,7 @@
 .page {
   min-height: 100vh;
   background: var(--paper);
-  padding: 0;
-  padding-bottom: 104rpx;
+  padding: 0 40rpx 104rpx;
   box-sizing: border-box;
 }
 .hint {
@@ -14,7 +13,7 @@
 }
 
 .cards {
-  padding: 24rpx 16rpx 40rpx;
+  padding: 24rpx 0 40rpx;
 }
 
 .d-mask {
@@ -74,9 +73,15 @@
   font-size: 40rpx;
   line-height: 1;
   color: var(--text-muted);
-  padding: 16rpx 24rpx;
+  padding: 24rpx 32rpx;
+  min-height: 88rpx;
+  min-width: 88rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-sm);
   transition: color var(--dur-fast) var(--ease-out);
+  box-sizing: border-box;
 }
 .d-close:active {
   color: var(--text);

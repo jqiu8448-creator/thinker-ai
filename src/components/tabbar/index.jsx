@@ -28,7 +28,6 @@ export default function Tabbar({ current, hideOnMobile }) {
     const currentpage = Taro.getCurrentPages();
     const currentRoute = currentpage.length ? '/' + currentpage[currentpage.length - 1].route : '';
     if (url === currentRoute) return;
-    // 记录当前页面滚动位置，以便切换回来时恢复
     try {
       sessionStorage.setItem('scroll_' + currentRoute, String(window.scrollY || 0));
     } catch (e) {}
@@ -37,6 +36,7 @@ export default function Tabbar({ current, hideOnMobile }) {
 
   // 页面加载后恢复滚动位置
   useEffect(() => {
+    let timeoutId;
     try {
       const currentpage = Taro.getCurrentPages();
       const currentRoute = currentpage.length ? '/' + currentpage[currentpage.length - 1].route : '';
@@ -44,15 +44,17 @@ export default function Tabbar({ current, hideOnMobile }) {
       if (saved) {
         const y = parseInt(saved, 10);
         if (y > 0) {
-          // 延迟恢复以确保内容已渲染
-          setTimeout(() => window.scrollTo(0, y), 150);
+          timeoutId = setTimeout(() => window.scrollTo(0, y), 150);
         }
       }
     } catch (e) {}
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [current]);
 
   const openSession = (sid) => {
-    Taro.navigateTo({ url: `/pages/huiyin/index?sessionId=${encodeURIComponent(sid)}` });
+    Taro.redirectTo({ url: `/pages/huiyin/index?sessionId=${encodeURIComponent(sid)}` });
   };
 
   return (

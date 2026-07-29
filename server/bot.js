@@ -10,6 +10,9 @@ const STATES = {
   WAITING_PANEL_CONFIRM: 'waiting_panel_confirm',
 };
 
+// 并发控制：同一用户串行处理，避免历史写入错乱
+const userLocks = new Map();
+
 function newSession() {
   return {
     state: STATES.IDLE,
@@ -39,6 +42,19 @@ const MODE_MENU = `请选择对话模式（回复数字）：
 const THINKER_LIST = engine.listThinkers();
 
 async function handleMessage(userId, text) {
+  // 并发控制：串行处理同一用户的连续消息
+  const prev = userLocks.get(userId) || Promise.resolve();
+  const next = prev
+    .catch(() => {})
+    .then(() => _handleMessage(userId, text))
+    .finally(() => {
+      if (userLocks.get(userId) === next) userLocks.delete(userId);
+    });
+  userLocks.set(userId, next);
+  return next;
+}
+
+async function _handleMessage(userId, text) {
   let session = getSession(userId);
 
   if (!session || session.state === STATES.IDLE) {
@@ -98,9 +114,17 @@ async function handleModeSelect(userId, session, text) {
 
   if (modeKey === 'duixi' || modeKey === 'dubai') {
     session.state = STATES.WAITING_THINKER;
+    let rec = [];
+    try {
+      rec = await engine.recommendThinkers('人生困惑');
+    } catch (e) {
+      console.error('[bot] recommendThinkers 失败:', e.message);
+      rec = THINKER_LIST.slice(0, 8).map((t) => ({ name: t.name, reason: t.category || '思想家' }));
+    }
+    // 存入 session，供用户数字选择时用
+    session.recommendedThinkers = rec.slice(0, 5);
     setSession(userId, session);
-    const rec = await engine.recommendThinkers('人生困惑');
-    const recList = rec.slice(0, 5).map((t, i) => `${i + 1}. ${t.name} — ${t.reason}`).join('\n');
+    const recList = session.recommendedThinkers.map((t, i) => `${i + 1}. ${t.name} — ${t.reason}`).join('\n');
     await sendText(userId,
       `已选「${modeNames[modeKey]}」模式。\n\n` +
       `请选择一位思想家（回复数字或姓名）：\n\n${recList}\n\n` +
@@ -122,7 +146,9 @@ async function handleThinkerSelect(userId, session, text) {
 
   if (/^\d+$/.test(trimmed)) {
     const idx = parseInt(trimmed) - 1;
-    const rec = THINKER_LIST.slice(0, 14);
+    const rec = session.recommendedThinkers && session.recommendedThinkers.length
+      ? session.recommendedThinkers
+      : THINKER_LIST.slice(0, 5);
     if (idx >= 0 && idx < rec.length) thinkerName = rec[idx].name;
   } else {
     const found = THINKER_LIST.find((t) => t.name === trimmed);
@@ -137,6 +163,7 @@ async function handleThinkerSelect(userId, session, text) {
   session.thinker = thinkerName;
   session.state = STATES.IN_CONVERSATION;
   session.history = [];
+  session.recommendedThinkers = null;
   setSession(userId, session);
 
   await sendText(userId, `${thinkerName} 已入座。\n\n请说出你的话题或困惑，开始对谈。`);
@@ -148,7 +175,21 @@ async function handlePanelConfirm(userId, session, text) {
 
   await sendText(userId, '正在为你引荐思想家，请稍候…');
 
-  const panel = await engine.suggestPanel(topic, session.mode);
+  let panel;
+  try {
+    panel = await engine.suggestPanel(topic, session.mode);
+  } catch (e) {
+    console.error('[bot] suggestPanel 失败:', e.message);
+    await sendText(userId, '引荐失败，思想家们此刻忙于清谈，请稍后重试。');
+    // 回退到等待主题输入状态
+    session.state = STATES.WAITING_PANEL_CONFIRM;
+    setSession(userId, session);
+    return;
+  }
+  if (!panel || !panel.length) {
+    await sendText(userId, '未能为该话题匹配到合适的思想家，请换一个话题再试。');
+    return;
+  }
   session.panel = panel;
   session.state = STATES.IN_CONVERSATION;
   session.history = [];
@@ -168,34 +209,57 @@ async function handleConversation(userId, session, text) {
 
   if (mode === 'duixi' || mode === 'dubai') {
     session.history.push({ role: 'user', content: text });
+    setSession(userId, session);
 
     await sendText(userId, `${session.thinker} 正在思考…`);
 
-    const reply = await engine.thinkerRoute(
-      text,
-      session.thinker,
-      mode,
-      session.history.slice(0, -1),
-    );
+    let reply;
+    try {
+      reply = await engine.thinkerRoute(
+        text,
+        session.thinker,
+        mode,
+        session.history.slice(0, -1),
+      );
+    } catch (e) {
+      console.error('[bot] thinkerRoute 失败:', e.message);
+      // 回滚刚加入的 user 消息
+      session.history.pop();
+      setSession(userId, session);
+      await sendText(userId, `${session.thinker} 正在闭关，请稍后再问。`);
+      return;
+    }
 
     session.history.push({ role: 'assistant', content: reply });
     setSession(userId, session);
 
     await sendText(userId, `【${session.thinker}】\n\n${reply}`);
   } else {
+    session.history.push({ role: 'user', content: text });
+    setSession(userId, session);
+
     await sendText(userId, '思想家们正在酝酿观点…');
 
-    const { replies } = await engine.multiThinkerRoute({
-      lead: session.panel[0],
-      mode: session.mode,
-      topic: session.topic,
-      message: text,
-      history: session.history,
-      panel: session.panel,
-    });
+    let replies = [];
+    try {
+      const result = await engine.multiThinkerRoute({
+        lead: session.panel[0],
+        mode: session.mode,
+        topic: session.topic,
+        message: text,
+        history: session.history.slice(0, -1),
+        panel: session.panel,
+      });
+      replies = result.replies || [];
+    } catch (e) {
+      console.error('[bot] multiThinkerRoute 失败:', e.message);
+      session.history.pop();
+      setSession(userId, session);
+      await sendText(userId, '思想家们今日清谈已毕，请改日再来。');
+      return;
+    }
 
     session.multiReplies = (session.multiReplies || []).concat(replies);
-    session.history.push({ role: 'user', content: text });
     session.history.push({ role: 'assistant', content: replies.map(r => `${r.thinker}：${r.content}`).join('\n\n') });
     setSession(userId, session);
 

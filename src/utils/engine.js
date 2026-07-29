@@ -139,8 +139,6 @@ ${cat_brief.join('\n')}
       topP: 0.9,
     });
 
-    console.log('[recommend_thinkers] LLM 原始返回:', text?.slice(0, 300));
-
     // 提取 JSON 数组（多重容错）
     let jsonText = text || '';
 
@@ -171,7 +169,6 @@ ${cat_brief.join('\n')}
       throw new Error('LLM 返回的 JSON 无法解析');
     }
 
-    console.log('[recommend_thinkers] 解析到的思想家:', items);
     const result = [];
     const seen = new Set();
     for (const item of items) {
@@ -192,7 +189,6 @@ ${cat_brief.join('\n')}
         seen.add(name);
       }
     }
-    console.log('[recommend_thinkers] 最终结果:', result);
     if (result.length) return result;
   } catch (e) {
     console.error('[recommend] LLM匹配失败，降级到关键词:', e);

@@ -206,13 +206,9 @@ export default function Home() {
     const intro = LEADER_INTROS[Math.floor(Math.random() * LEADER_INTROS.length)];
     setLeaderText(intro);
 
-    console.log('[selectMode] 开始推荐，topic:', topic, 'hasApi:', hasApiConfig());
-
     // 调用大模型（组长）理解问题并推荐思想家
     callCloud('recommend', { topic })
       .then((r) => {
-        console.log('[selectMode] recommend 返回:', r);
-
         let thinkerList = [];
         let reason = '';
 
@@ -222,10 +218,8 @@ export default function Home() {
             reason: t.reason || '适合与你探讨这个问题',
             summary: t.summary || '',
           }));
-          console.log('[selectMode] 推荐结果:', thinkerList);
           reason = '细读你的困惑，为你引荐以下几位：';
         } else {
-          console.log('[selectMode] 推荐失败，降级到本地兜底');
           // 降级：本地兜底，根据话题关键词生成更贴切的理由
           const categories = thinkersData.categories || [];
           const allThinkers = thinkersData.thinkers || [];
