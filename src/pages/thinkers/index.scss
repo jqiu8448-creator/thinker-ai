@@ -2,18 +2,19 @@
   min-height: 100vh;
   background: var(--paper);
   padding: 0;
+  padding-bottom: 104rpx;
+  box-sizing: border-box;
 }
 .hint {
   font-size: 30rpx;
   color: var(--text-muted);
-  font-family: var(--font-display);
   text-align: center;
   padding: 32rpx 0 24rpx;
   letter-spacing: 3rpx;
 }
 
 .cards {
-  padding: 24rpx 16rpx 140rpx;
+  padding: 24rpx 16rpx 40rpx;
 }
 
 .d-mask {

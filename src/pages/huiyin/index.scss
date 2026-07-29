@@ -8,12 +8,14 @@
   flex-direction: column;
   min-height: 100vh;
   background: var(--paper);
+  padding-bottom: 104rpx;
+  box-sizing: border-box;
 }
 
 /* 桌面端：左右布局 */
 @media (min-width: 768px) {
   .container {
-    padding: 200rpx var(--margin) 0;
+    padding: 200rpx var(--margin) 100rpx;
     box-sizing: border-box;
     min-height: 100vh;
     flex-direction: row;
@@ -292,62 +294,35 @@
 
 @media (min-width: 768px) {
   .chat-main {
+    position: sticky;
+    top: 200rpx;
+    height: calc(100vh - 200rpx);
     min-height: calc(100vh - 200rpx);
     padding: 0 56rpx;
     box-sizing: border-box;
+    overflow: hidden;
   }
 }
 
-/* ===== 移动端顶栏 ===== */
+/* ===== 移动端轻量标题（与思想家/设置页 .hint 风格统一） ===== */
 .chat-top {
   display: none;
 }
 
 @media (max-width: 767px) {
   .chat-top {
-    display: flex;
-    align-items: center;
-    height: 88rpx;
-    padding: 0 32rpx;
-    border-bottom: 1px solid var(--line);
-    background: var(--paper-card);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .ct-back {
-    font-size: 36rpx;
+    display: block;
+    font-size: 30rpx;
     color: var(--text-muted);
-    line-height: 1;
-    cursor: pointer;
-    padding-right: 16rpx;
-  }
-
-  .ct-center {
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 12rpx;
-  }
-
-  .ct-brand {
-    font-size: 34rpx;
-    color: var(--seal);
     font-family: var(--font-display);
+    text-align: center;
+    padding: 32rpx 0 24rpx;
     letter-spacing: 3rpx;
   }
 
-  .ct-mode {
-    font-size: 22rpx;
-    color: var(--text-faint);
+  /* 楷体类覆盖字体 */
+  .chat-top.kai {
     font-family: var(--font-kai);
-    letter-spacing: 2rpx;
-  }
-
-  .ct-placeholder {
-    width: 60rpx;
   }
 }
 
@@ -457,17 +432,22 @@
 /* ===== 对话区域 ===== */
 .chat-area {
   flex: 1;
-  padding: 48rpx 32rpx 240rpx;
+  padding: 48rpx 32rpx calc(240rpx + 120rpx);
   display: flex;
   flex-direction: column;
 }
 
 @media (min-width: 768px) {
   .chat-area {
-    padding: 40rpx 0 240rpx;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 40rpx 0 48rpx;
     width: 100%;
     max-width: 2000rpx;
     margin: 0 auto;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -890,7 +870,7 @@ taro-text-core.content,
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 80rpx 40rpx;
+  padding: 40rpx 40rpx 80rpx;
   animation: welcome-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1058,9 +1038,11 @@ taro-text-core.content,
 
 /* ===== 输入区 ===== */
 .input-area {
-  position: sticky;
-  bottom: 0;
-  z-index: 50;
+  position: fixed;
+  bottom: 104rpx;
+  left: 0;
+  right: 0;
+  z-index: 40;
   padding: 20rpx 16rpx calc(24rpx + env(safe-area-inset-bottom));
   background: linear-gradient(to bottom, rgba(250,249,246,0), var(--paper) 30%);
 }
@@ -1283,6 +1265,11 @@ taro-textarea-core.input-field textarea::placeholder {
   }
 
   .input-area {
+    position: static;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    z-index: auto;
     padding: 20rpx 0 48rpx;
     width: 100%;
     max-width: 2000rpx;

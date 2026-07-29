@@ -735,7 +735,7 @@ export default function Huiyin() {
 
   return (
     <View className="container">
-      <Tabbar current="huiyin" hideOnMobile />
+      <Tabbar current="huiyin" />
 
       {/* 桌面端：左侧历史侧边栏 */}
       <View className={`sidebar ${historyOpen ? 'open' : 'closed'}`}>
@@ -801,16 +801,9 @@ export default function Huiyin() {
 
       {/* 主对话区 */}
       <View className="chat-main">
-        {/* 移动端顶栏 */}
-        <View className="chat-top">
-          <View className="ct-back" onClick={onBack}>
-            ‹
-          </View>
-          <View className="ct-center">
-            <View className="ct-brand kai">{thinker || '清谈'}</View>
-            <View className="ct-mode">{modeNameState}</View>
-          </View>
-          <View className="ct-placeholder" />
+        {/* 移动端轻量标题（与思想家/设置页 .hint 风格统一） */}
+        <View className="chat-top kai">
+          {thinker || '清谈'} · {modeNameState}
         </View>
 
         {/* 桌面端清谈头部 */}

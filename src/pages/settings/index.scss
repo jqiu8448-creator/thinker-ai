@@ -3,14 +3,15 @@
   flex-direction: column;
   min-height: 100vh;
   background: var(--paper);
-  padding: 56rpx 40rpx 180rpx;
+  padding: 0 40rpx 180rpx;
+  box-sizing: border-box;
 }
 .hint {
   flex: none;
   font-size: 30rpx;
   color: var(--ink-faint);
   text-align: center;
-  padding: 28rpx 0 24rpx;
+  padding: 32rpx 0 24rpx;
   letter-spacing: 3rpx;
 }
 .loading {
