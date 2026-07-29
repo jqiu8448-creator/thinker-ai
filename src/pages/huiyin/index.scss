@@ -529,14 +529,16 @@
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
-  text-align: center !important;
+  text-align: left !important;
+  text-align-last: left !important;
 }
 
 /* Taro H5 Text 组件样式覆盖 */
 taro-text-core.content,
 .msg taro-text-core,
 .bubble taro-text-core {
-  text-align: center !important;
+  text-align: left !important;
+  text-align-last: left !important;
   display: block !important;
   width: 100% !important;
 }
