@@ -5,6 +5,7 @@ import { callCloud } from '@/utils/cloud';
 import { getGlobal, ensureWatermark } from '@/utils/global';
 import Loading from '@/components/loading';
 import ThinkerGrid from '@/components/thinker-grid';
+import Tabbar from '@/components/tabbar';
 import './index.scss';
 
 function countryRank(c) {
@@ -379,131 +380,134 @@ export default function Thinkers() {
   };
 
   return (
-    <View className="page page-enter">
-      <View className="hint kai">遍览先贤 · 点选即谈</View>
+    <View className="page">
+      <Tabbar current="thinkers" />
+      <View className="page-fade-in">
+        <View className="hint kai">遍览先贤 · 点选即谈</View>
 
-      <View className="cards">
-        <ThinkerGrid thinkers={displayList} searchable onPick={onTap} />
-      </View>
+        <View className="cards">
+          <ThinkerGrid thinkers={displayList} searchable onPick={onTap} />
+        </View>
 
-      {showDetail && (
-        <View className="d-mask" onClick={closeDetail}>
-          <View className="d-card" onClick={(e) => e.stopPropagation()}>
-            <View className="d-bar">
-              <View className="d-bar-title kai">人物档案</View>
-              <View className="d-close" onClick={closeDetail}>
-                ✕
+        {showDetail && (
+          <View className="d-mask" onClick={closeDetail}>
+            <View className="d-card" onClick={(e) => e.stopPropagation()}>
+              <View className="d-bar">
+                <View className="d-bar-title kai">人物档案</View>
+                <View className="d-close" onClick={closeDetail}>
+                  ✕
+                </View>
               </View>
-            </View>
 
-            <View className="d-scroll">
-              <View className="d-body">
-                {/* 左栏：人物头部 + 简介 + 事实 + 名言 + 著述（底部） */}
-                <View className="d-side">
-                  <View className="d-head">
-                    <View className="d-name-row">
-                      <View className="d-name kai">{detail && detail.name}</View>
-                      {detail && detail.seal && (
-                        <View className="d-seal kai">{detail.seal}</View>
+              <View className="d-scroll">
+                <View className="d-body">
+                  {/* 左栏：人物头部 + 简介 + 事实 + 名言 + 著述（底部） */}
+                  <View className="d-side">
+                    <View className="d-head">
+                      <View className="d-name-row">
+                        <View className="d-name kai">{detail && detail.name}</View>
+                        {detail && detail.seal && (
+                          <View className="d-seal kai">{detail.seal}</View>
+                        )}
+                      </View>
+                      {detail && detail.chips && detail.chips.length > 0 && (
+                        <View className="d-chips">
+                          {(detail.chips || []).map((c, i) => (
+                            <Text key={i} className="d-chip kai">
+                              {c}
+                            </Text>
+                          ))}
+                        </View>
                       )}
                     </View>
-                    {detail && detail.chips && detail.chips.length > 0 && (
-                      <View className="d-chips">
-                        {(detail.chips || []).map((c, i) => (
-                          <Text key={i} className="d-chip kai">
-                            {c}
-                          </Text>
-                        ))}
+
+                    {!detailLoading && detail && (
+                      <View className="d-side-block">
+                        {detail.tagline && <View className="d-tagline kai">{detail.tagline}</View>}
+                        <View className="d-facts">
+                          <View className="d-fact">
+                            <View className="d-fact-k">时代</View>
+                            <View className="d-fact-v">{detail.facts && detail.facts.era}</View>
+                          </View>
+                          <View className="d-fact">
+                            <View className="d-fact-k">身份</View>
+                            <View className="d-fact-v">{detail.facts && detail.facts.identity}</View>
+                          </View>
+                          <View className="d-fact">
+                            <View className="d-fact-k">核心</View>
+                            <View className="d-fact-v">{detail.facts && detail.facts.core}</View>
+                          </View>
+                        </View>
+                        {detail.quote && (
+                          <View className="d-quote">
+                            <View className="d-quote-text">{detail.quote}</View>
+                            {detail.quoteSrc && (
+                              <View className="d-quote-src kai">— {detail.quoteSrc}</View>
+                            )}
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {/* 著述移到左栏底部 */}
+                    {!detailLoading && detail && detail.works && detail.works.length > 0 && (
+                      <View className="d-side-works">
+                        <View className="d-block-title kai">著述</View>
+                        <View className="d-works">
+                          {detail.works.map((w, i) => (
+                            <View key={i} className="d-work">
+                              <Text className="d-work-num kai">
+                                {String(i + 1).padStart(2, '0')}
+                              </Text>
+                              <Text className="d-work-txt kai">《{w}》</Text>
+                            </View>
+                          ))}
+                        </View>
                       </View>
                     )}
                   </View>
 
-                  {!detailLoading && detail && (
-                    <View className="d-side-block">
-                      {detail.tagline && <View className="d-tagline kai">{detail.tagline}</View>}
-                      <View className="d-facts">
-                        <View className="d-fact">
-                          <View className="d-fact-k">时代</View>
-                          <View className="d-fact-v">{detail.facts && detail.facts.era}</View>
-                        </View>
-                        <View className="d-fact">
-                          <View className="d-fact-k">身份</View>
-                          <View className="d-fact-v">{detail.facts && detail.facts.identity}</View>
-                        </View>
-                        <View className="d-fact">
-                          <View className="d-fact-k">核心</View>
-                          <View className="d-fact-v">{detail.facts && detail.facts.core}</View>
-                        </View>
-                      </View>
-                      {detail.quote && (
-                        <View className="d-quote">
-                          <View className="d-quote-text">{detail.quote}</View>
-                          {detail.quoteSrc && (
-                            <View className="d-quote-src kai">— {detail.quoteSrc}</View>
+                  {/* 右栏：仅自述展开 */}
+                  <View className="d-main">
+                    {!detailLoading && detail && detail.narrative && (
+                      <View className="d-block">
+                        <View className="d-block-title kai">自述</View>
+                        <View className="d-narrative">
+                          {detail.narrativeLead && (
+                            <Text className="d-lead kai">{detail.narrativeLead}</Text>
                           )}
+                          <Text className="d-narrative-body" userSelect>
+                            {detail.narrativeRest}
+                          </Text>
+                          <View className="d-sign kai">—— {detail.name} 自述</View>
                         </View>
-                      )}
-                    </View>
-                  )}
-
-                  {/* 著述移到左栏底部 */}
-                  {!detailLoading && detail && detail.works && detail.works.length > 0 && (
-                    <View className="d-side-works">
-                      <View className="d-block-title kai">著述</View>
-                      <View className="d-works">
-                        {detail.works.map((w, i) => (
-                          <View key={i} className="d-work">
-                            <Text className="d-work-num kai">
-                              {String(i + 1).padStart(2, '0')}
-                            </Text>
-                            <Text className="d-work-txt kai">《{w}》</Text>
-                          </View>
-                        ))}
                       </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
                 </View>
 
-                {/* 右栏：仅自述展开 */}
-                <View className="d-main">
-                  {!detailLoading && detail && detail.narrative && (
-                    <View className="d-block">
-                      <View className="d-block-title kai">自述</View>
-                      <View className="d-narrative">
-                        {detail.narrativeLead && (
-                          <Text className="d-lead kai">{detail.narrativeLead}</Text>
-                        )}
-                        <Text className="d-narrative-body" userSelect>
-                          {detail.narrativeRest}
-                        </Text>
-                        <View className="d-sign kai">—— {detail.name} 自述</View>
-                      </View>
-                    </View>
-                  )}
-                </View>
+                {detailLoading && (
+                  <View className="d-loading kai">
+                    <Loading text="查阅档案中…" />
+                  </View>
+                )}
+
+                <View className="d-scroll-foot" />
               </View>
 
-              {detailLoading && (
-                <View className="d-loading kai">
-                  <Loading text="查阅档案中…" />
+              <View className="d-foot">
+                <View className="d-share kai" onClick={shareCard}>
+                  分享
                 </View>
-              )}
-
-              <View className="d-scroll-foot" />
-            </View>
-
-            <View className="d-foot">
-              <View className="d-share kai" onClick={shareCard}>
-                分享
-              </View>
-              <View className="d-talk kai" onClick={startChat}>
-                开始对话
+                <View className="d-talk kai" onClick={startChat}>
+                  开始对话
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      )}
-      <Canvas type="2d" id="shareCanvas" className="share-canvas" />
+        )}
+        <Canvas type="2d" id="shareCanvas" className="share-canvas" />
+      </View>
     </View>
   );
 }

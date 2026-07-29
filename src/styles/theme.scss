@@ -99,11 +99,8 @@ body {
   to { opacity: 1; }
 }
 
-/* 统一页面入场动画：淡入（不用 transform，避免破坏子元素 position:fixed） */
-@keyframes page-enter {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.page-enter {
-  animation: page-enter 0.4s var(--ease-out) both;
+/* 四页面内容统一淡入（包装层：必须放在不含Tabbar之后的业务内容上，
+   不包含 Tabbar，避免破坏 Tabbar 的 position:fixed */
+.page-fade-in {
+  animation: fade-in 0.4s var(--ease-out) both;
 }

@@ -8,6 +8,7 @@ import { stressTest } from '@/utils/llm';
 import { modeName } from '@/utils/modes';
 import { isHosted, getHostedConfig, hostedHeaders } from '@/utils/hosted';
 import Popup from '@/components/popup';
+import Tabbar from '@/components/tabbar';
 import './index.scss';
 
 function fmt(ts) {
@@ -305,8 +306,10 @@ export default function Settings() {
   };
 
   return (
-    <View className="page page-enter">
-      <View className="hint kai">设置 · 对话之余</View>
+    <View className="page">
+      <Tabbar current="settings" />
+      <View className="page-fade-in">
+        <View className="hint kai">设置 · 对话之余</View>
 
       {/* 保留数量 */}
       <View className="setting-card" onClick={() => setShowRetention(true)}>
@@ -616,7 +619,7 @@ export default function Settings() {
           <View className="about-ver">版本 1.0.0</View>
         </View>
       </Popup>
-
+      </View>
     </View>
   );
 }
