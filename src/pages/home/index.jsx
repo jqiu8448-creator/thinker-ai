@@ -354,7 +354,6 @@ export default function Home() {
     <View className="page">
       {showSplash && <Splash onEnter={() => setShowSplash(false)} />}
       <Tabbar current="home" />
-      <View className="page-fade-in">
 
       {/* 标题 */}
       <View className={`hero step-${step}`}>
@@ -568,7 +567,6 @@ export default function Home() {
           </View>
         </View>
       )}
-      </View>
     </View>
   );
 }

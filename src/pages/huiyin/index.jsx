@@ -736,7 +736,6 @@ export default function Huiyin() {
   return (
     <View className="container">
       <Tabbar current="huiyin" />
-      <View className="page-fade-in">
 
       {/* 桌面端：左侧历史侧边栏 */}
       <View className={`sidebar ${historyOpen ? 'open' : 'closed'}`}>
@@ -988,7 +987,6 @@ export default function Huiyin() {
             </View>
           </View>
         </View>
-      </View>
       </View>
     </View>
   );
