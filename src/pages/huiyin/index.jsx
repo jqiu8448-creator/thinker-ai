@@ -214,11 +214,21 @@ export default function Huiyin() {
     setMessages((prev) =>
       prev.map((m) => (m.id === id ? { ...m, content: (m.content || '') + delta } : m))
     );
+    // 流式增量时滚动到该消息底部，确保看到最新内容
+    requestAnimationFrame(() => {
+      const el = chatAreaRef.current && chatAreaRef.current.querySelector('#msg-' + id);
+      if (el) el.scrollIntoView({ behavior: 'auto', block: 'end' });
+    });
   };
   const finalizeStream = (id, content) => {
     setMessages((prev) =>
       prev.map((m) => (m.id === id ? { ...m, content: content || m.content, streaming: false } : m))
     );
+    // 完成后滚动到底部
+    requestAnimationFrame(() => {
+      const el = chatAreaRef.current && chatAreaRef.current.querySelector('#msg-' + id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
   };
 
   // 使用 ref 读取最新状态，避免闭包陈旧
@@ -390,11 +400,18 @@ export default function Huiyin() {
     applyFontScaleToDom();
   });
 
-  // 滚动到目标消息（用 useEffect 替代 ref 回调，避免每次渲染都执行）
+  // 滚动到目标消息（multi 消息对齐底部，其他对齐顶部）
   useEffect(() => {
     if (scrollTarget && chatAreaRef.current) {
       const target = chatAreaRef.current.querySelector('#' + scrollTarget);
-      if (target) target.scrollIntoView({ behavior: 'smooth' });
+      if (target) {
+        // multi 消息很高，对齐底部避免被输入框遮挡
+        const isMulti = target.classList.contains('multi');
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: isMulti ? 'end' : 'start',
+        });
+      }
     }
   }, [scrollTarget]);
 
@@ -428,12 +445,11 @@ export default function Huiyin() {
         }
       : null;
 
-    if (streamMode) {
-      streamId = seqRef.current++;
-      setMessages((prev) => prev.concat([{ id: streamId, role: 'assistant', content: '', thinker: thinkerRef.current, streaming: true }]));
-      setWelcome(false);
-      setScrollTarget('msg-' + streamId);
-    }
+    // 所有模式都创建占位消息：流式模式用于逐字显示，偶得/会饮用于显示 thinking 指示器
+    streamId = seqRef.current++;
+    setMessages((prev) => prev.concat([{ id: streamId, role: 'assistant', content: '', thinker: thinkerRef.current, streaming: true }]));
+    setWelcome(false);
+    setScrollTarget('msg-' + streamId);
 
     callCloud('chat', {
       message: text,
@@ -453,23 +469,32 @@ export default function Huiyin() {
         return;
       }
       if (!r) {
-        // callCloud 内部 catch 返回 null：保留已有流式内容
-        if (streamId != null) {
-          const existing = messagesRef.current.find((m) => m.id === streamId);
-          if (existing && existing.content && existing.content.trim()) {
-            finalizeStream(streamId, existing.content);
+        // callCloud 内部 catch 返回 null
+        if (streamMode) {
+          // 流式模式：保留已有流式内容
+          if (streamId != null) {
+            const existing = messagesRef.current.find((m) => m.id === streamId);
+            if (existing && existing.content && existing.content.trim()) {
+              finalizeStream(streamId, existing.content);
+            } else {
+              finalizeStream(streamId, '（连接中断，请重新提问）');
+            }
           } else {
-            finalizeStream(streamId, '（连接中断，请重新提问）');
+            addMsg('system', '请求失败，请稍后再试');
           }
         } else {
+          // 偶得/会饮：移除占位，显示错误
+          if (streamId != null) setMessages((prev) => prev.filter((m) => m.id !== streamId));
           addMsg('system', '请求失败，请稍后再试');
         }
         return;
       }
       if (!r.ok) {
-        if (streamId != null) {
-          finalizeStream(streamId, r.error || '请求失败，请稍后再试');
+        if (streamMode) {
+          if (streamId != null) finalizeStream(streamId, r.error || '请求失败，请稍后再试');
+          else addMsg('system', r.error || '请求失败，请稍后再试');
         } else {
+          if (streamId != null) setMessages((prev) => prev.filter((m) => m.id !== streamId));
           addMsg('system', r.error || '请求失败，请稍后再试');
         }
         return;
@@ -479,6 +504,8 @@ export default function Huiyin() {
       if (streamMode) {
         finalizeStream(streamId, r.reply);
       } else {
+        // 偶得/会饮：移除 thinking 占位消息，再添加 multi 消息
+        setMessages((prev) => prev.filter((m) => m.id !== streamId));
         renderReply(r);
       }
       // 延迟一帧再 persist，确保 messagesRef 已更新
@@ -491,17 +518,22 @@ export default function Huiyin() {
         userCancelledRef.current = false;
         return;
       }
-      // 流式中断：保留已生成的内容，不替换为"失败"
-      if (streamId != null) {
-        const existing = messagesRef.current.find((m) => m.id === streamId);
-        if (existing && existing.content && existing.content.trim()) {
-          // 已有内容，保留并标记完成
-          finalizeStream(streamId, existing.content);
+      // 中断处理
+      if (streamMode) {
+        // 流式模式：保留已生成的内容
+        if (streamId != null) {
+          const existing = messagesRef.current.find((m) => m.id === streamId);
+          if (existing && existing.content && existing.content.trim()) {
+            finalizeStream(streamId, existing.content);
+          } else {
+            finalizeStream(streamId, '（连接中断，请重新提问）');
+          }
         } else {
-          // 完全没收到内容，显示失败提示
-          finalizeStream(streamId, '（连接中断，请重新提问）');
+          addMsg('system', '请求失败，请稍后再试');
         }
       } else {
+        // 偶得/会饮：移除占位，显示错误
+        if (streamId != null) setMessages((prev) => prev.filter((m) => m.id !== streamId));
         addMsg('system', '请求失败，请稍后再试');
       }
     });
@@ -523,12 +555,11 @@ export default function Huiyin() {
         }
       : null;
 
-    if (streamMode) {
-      streamId = seqRef.current++;
-      setMessages((prev) => prev.concat([{ id: streamId, role: 'assistant', content: '', thinker: thinkerName, streaming: true }]));
-      setWelcome(false);
-      setScrollTarget('msg-' + streamId);
-    }
+    // 所有模式都创建占位消息：流式模式用于逐字显示，偶得/会饮用于显示 thinking 指示器
+    streamId = seqRef.current++;
+    setMessages((prev) => prev.concat([{ id: streamId, role: 'assistant', content: '', thinker: thinkerName, streaming: true }]));
+    setWelcome(false);
+    setScrollTarget('msg-' + streamId);
 
     callCloud('chat', {
       message: text,
@@ -548,23 +579,32 @@ export default function Huiyin() {
         return;
       }
       if (!r) {
-        // callCloud 内部 catch 返回 null：保留已有流式内容
-        if (streamId != null) {
-          const existing = messagesRef.current.find((m) => m.id === streamId);
-          if (existing && existing.content && existing.content.trim()) {
-            finalizeStream(streamId, existing.content);
+        // callCloud 内部 catch 返回 null
+        if (streamMode) {
+          // 流式模式：保留已有流式内容
+          if (streamId != null) {
+            const existing = messagesRef.current.find((m) => m.id === streamId);
+            if (existing && existing.content && existing.content.trim()) {
+              finalizeStream(streamId, existing.content);
+            } else {
+              finalizeStream(streamId, '（连接中断，请重新提问）');
+            }
           } else {
-            finalizeStream(streamId, '（连接中断，请重新提问）');
+            addMsg('system', '请求失败，请稍后再试');
           }
         } else {
+          // 偶得/会饮：移除占位，显示错误
+          if (streamId != null) setMessages((prev) => prev.filter((m) => m.id !== streamId));
           addMsg('system', '请求失败，请稍后再试');
         }
         return;
       }
       if (!r.ok) {
-        if (streamId != null) {
-          finalizeStream(streamId, r.error || '请求失败，请稍后再试');
+        if (streamMode) {
+          if (streamId != null) finalizeStream(streamId, r.error || '请求失败，请稍后再试');
+          else addMsg('system', r.error || '请求失败，请稍后再试');
         } else {
+          if (streamId != null) setMessages((prev) => prev.filter((m) => m.id !== streamId));
           addMsg('system', r.error || '请求失败，请稍后再试');
         }
         return;
@@ -574,6 +614,8 @@ export default function Huiyin() {
       if (streamMode) {
         finalizeStream(streamId, r.reply);
       } else {
+        // 偶得/会饮：移除 thinking 占位消息，再添加 multi 消息
+        setMessages((prev) => prev.filter((m) => m.id !== streamId));
         renderReply(r);
       }
       setTimeout(() => persistState({ sessionId: r.sessionId, thinker: thinkerName, mode: modeStr }), 0);
