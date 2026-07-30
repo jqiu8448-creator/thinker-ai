@@ -1028,11 +1028,41 @@ taro-text-core.content,
   background: linear-gradient(to bottom, rgba(250,249,246,0), var(--paper) 30%);
 }
 
+/* 输入框外壳：flex 容器，左输入 + 右按钮 */
+.input-box {
+  width: 100%;
+  border: 1px solid var(--border-ink, rgba(26,26,26,0.08));
+  border-radius: 8rpx;
+  background: var(--surface);
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  min-height: 96rpx;
+  transition: border-color var(--dur-fast) var(--ease-out);
+  cursor: text;
+}
+.input-box::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--seal);
+  opacity: 0.15;
+  pointer-events: none;
+}
+.input-box:focus-within {
+  border-color: var(--seal);
+}
+.input-box:focus-within::before {
+  opacity: 0.4;
+}
+
 /* Taro H5 原生 textarea 彻底禁用拖拽与缩放 */
-.input-field textarea,
-.input-field .taro-textarea,
-taro-textarea-core.input-field textarea,
-taro-textarea-core.input-field .taro-textarea,
+.input-box .chat-textarea textarea,
+.input-box .chat-textarea .taro-textarea,
+.input-box taro-textarea-core.chat-textarea textarea,
+.input-box taro-textarea-core.chat-textarea .taro-textarea,
 .input-box .taro-textarea,
 .input-box textarea,
 .input-area textarea {
@@ -1046,38 +1076,14 @@ taro-textarea-core.input-field .taro-textarea,
   box-shadow: none !important;
 }
 
-.input-box {
-  width: 100%;
-  border: 1px solid var(--border-ink, rgba(26,26,26,0.08));
-  border-radius: 8rpx;
-  background: var(--surface);
-  display: flex;
-  align-items: stretch;
-  position: relative;
-  overflow: hidden;
-  transition: border-color var(--dur-fast) var(--ease-out);
-}
-.input-box::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: var(--seal);
-  opacity: 0.15;
-}
-.input-box:focus-within {
-  border-color: var(--seal);
-}
-.input-box:focus-within::before {
-  opacity: 0.4;
-}
-
-.input-field,
-.input-field textarea,
-.input-field taro-textarea-core,
-.input-field > textarea,
-taro-textarea-core.input-field,
-taro-textarea-core.input-field textarea {
+/* 外层 + 内层统一样式（与稳定版本 edeea1f 一致的结构） */
+/* 关键：不用 display:flex !important，避免与 autoHeight 形成 flex 死锁 */
+.chat-textarea,
+.chat-textarea textarea,
+.chat-textarea taro-textarea-core,
+.chat-textarea > textarea,
+taro-textarea-core.chat-textarea,
+taro-textarea-core.chat-textarea textarea {
   flex: 1;
   min-width: 0;
   min-height: 96rpx;
@@ -1088,7 +1094,7 @@ taro-textarea-core.input-field textarea {
   font-family: var(--font-sans) !important;
   padding: 20rpx 32rpx;
   line-height: 56rpx;
-  text-align: center !important;
+  text-align: left !important;
   background: transparent !important;
   outline: none !important;
   box-shadow: none !important;
@@ -1099,31 +1105,13 @@ taro-textarea-core.input-field textarea {
   user-select: auto;
   box-sizing: border-box;
 }
-.input-field .weui-input {
-  text-align: center !important;
-  font-family: var(--font-sans) !important;
-  color: var(--text) !important;
-  font-size: 30rpx;
-  letter-spacing: 2rpx;
-  line-height: 56rpx;
-  padding: 0;
-  margin: 0;
-}
-.input-field .weui-input::placeholder,
-.input-field .ph,
-.input-field textarea::placeholder,
-.input-field taro-textarea-core::placeholder {
-  color: var(--ink-faint) !important;
-  font-family: var(--font-kai) !important;
-  letter-spacing: 6rpx !important;
-  font-weight: 400 !important;
-  opacity: 1 !important;
-}
-.input-field textarea,
-.input-field taro-textarea-core,
-.input-field > textarea,
-taro-textarea-core.input-field,
-taro-textarea-core.input-field textarea,
+
+/* 二次覆盖：确保 width/max-height/line-height 等关键属性 */
+.chat-textarea textarea,
+.chat-textarea taro-textarea-core,
+.chat-textarea > textarea,
+taro-textarea-core.chat-textarea,
+taro-textarea-core.chat-textarea textarea,
 .input-box textarea,
 .input-box taro-textarea-core textarea,
 .input-area textarea {
@@ -1134,23 +1122,29 @@ taro-textarea-core.input-field textarea,
   box-shadow: none !important;
   width: 100% !important;
   max-height: 280rpx !important;
-  padding: 0 !important;
+  padding: 20rpx 32rpx !important;
   margin: 0 !important;
-  text-align: center !important;
+  text-align: left !important;
   font-family: var(--font-sans) !important;
   line-height: 56rpx !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
 }
 
-/* placeholder 也居中 */
-.input-field textarea::placeholder,
-.input-field taro-textarea-core::placeholder,
+/* placeholder：楷体淡墨，左对齐 */
+.chat-textarea textarea::placeholder,
+.chat-textarea taro-textarea-core::placeholder,
 .input-box textarea::placeholder,
-taro-textarea-core.input-field textarea::placeholder {
-  text-align: center !important;
+taro-textarea-core.chat-textarea textarea::placeholder {
+  color: var(--ink-faint) !important;
+  font-family: var(--font-kai) !important;
+  letter-spacing: 6rpx !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+  text-align: left !important;
 }
 
+/* 发送按钮 */
 .send-btn {
   flex: none;
   display: flex;
@@ -1261,38 +1255,17 @@ taro-textarea-core.input-field textarea::placeholder {
     max-width: 2000rpx;
     margin: 0 auto;
   }
-  .input-field {
-    font-size: 32rpx;
-    max-height: 240rpx;
+  .input-box .chat-textarea textarea,
+  .input-box taro-textarea-core.chat-textarea textarea,
+  .input-box taro-textarea-core.chat-textarea .taro-textarea {
+    font-size: 32rpx !important;
+    max-height: 240rpx !important;
   }
 
   /* 多人对话桌面端 */
   .bubble .content {
     font-size: 28rpx;
   }
-}
-
-/* 让整个输入区域可点击 */
-.input-box {
-  cursor: text;
-}
-.input-field,
-taro-textarea-core.input-field {
-  display: block;
-  width: 100% !important;
-  min-height: 120rpx;
-  cursor: text;
-}
-taro-textarea-core.input-field {
-  display: flex;
-  align-items: stretch;
-}
-taro-textarea-core.input-field > textarea,
-taro-textarea-core.input-field .taro-textarea {
-  flex: 1;
-  width: 100% !important;
-  min-height: 120rpx;
-  cursor: text;
 }
 
 /* ===== 对话字号档位 ===== */

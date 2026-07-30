@@ -956,17 +956,16 @@ export default function Huiyin() {
         <View className="input-area">
           <View className="input-box">
             <Textarea
-              className="input-field"
+              className="chat-textarea"
               value={inputValue}
-              placeholder=""
-              placeholderClass="ph"
+              placeholder="请输入你的问题或困惑…"
+              placeholderClass="chat-ph"
               onInput={onInput}
               onConfirm={onSend}
               maxlength={-1}
               autoHeight
               autoHeightMaxRows={4}
               adjustPosition={false}
-              style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', boxShadow: 'none', textAlign: 'center' }}
             />
             <View className={`send-btn ${typing ? 'disabled' : ''}`} onClick={onSend}>
               <Text className="send-text">{typing ? '思考中' : '送出'}</Text>
